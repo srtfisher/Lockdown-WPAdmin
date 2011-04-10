@@ -7,14 +7,18 @@ Author
 ------
 
 Sean Fisher
-[@talkingwithsean][http://twitter.com/talkingwithsean]
+
+[@talkingwithsean](http://twitter.com/talkingwithsean)
+
 [http://talkingwithsean.com/](http://talkingwithsean.com/)
 
 
 Requirements
 ------------
 WordPress 3.0
+
 PHP 5
+
 MySQL 5
 
 Description
