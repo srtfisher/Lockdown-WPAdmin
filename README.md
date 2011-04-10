@@ -7,8 +7,8 @@ Author
 ------
 
 Sean Fisher
-@talkingwithsean
-http://talkingwithsean.com/
+[@talkingwithsean][http://twitter.com/talkingwithsean]
+[http://talkingwithsean.com/](http://talkingwithsean.com/)
 
 
 Requirements
