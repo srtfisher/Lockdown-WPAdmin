@@ -1,3 +1,4 @@
+<?php if (! defined('ABSPATH')) exit; ?>
 <div class="wrap">
 	<div id="icon-options-general" class="icon32"></div><h2>HTTP Authentication Private Users</h2>
 

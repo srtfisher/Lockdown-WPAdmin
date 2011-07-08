@@ -1,4 +1,4 @@
-<?php
+<?php if (! defined('ABSPATH')) exit;
 /**
  * We don't want to allow for this plugin to be used in WP-MS or network wide.
  *

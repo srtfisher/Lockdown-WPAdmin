@@ -1,7 +1,8 @@
 Lockdown WP Admin
 =============
 
-This is a free WordPress plugin that will add security to your WordPress site. It will hide the admin area and rename the login area. Also, it add HTTP auth to your login area, too. We want to make sure you're safe on the web.
+This plugin will hide /wp-admin/ when you aren't logged in. If a user isn't logged in and they attempt to access /wp-admin/ directly, they will be unable to and it will return a 404. It can also rename the login URL. Also, you can add HTTP authentication directly from WP admin and add custom username/password combinations for the HTTP auth, or use the WordPress credentials. This doesn't touch any .htaccess files or change the WordPress core files. All the CSS/Images under /wp-admin/ are still accessible, just not the .php ones. If you enable HTTP authencation, it will add HTTP auth to the PHP files in /wp-admin/
+
 
 Author
 ------
@@ -16,21 +17,13 @@ Sean Fisher
 Requirements
 ------------
 WordPress 3.0
-
-PHP 5
-
+PHP 5.2
 MySQL 5
 
 Description
 -----------
 
-This plugin will hide /wp-admin/ when you aren't logged in. If a user isn't logged in and they attempt to access /wp-admin/ directly, they will be unable to and it will return a 404.
-
-Also, you can add HTTP authentication directly from WP admin and add custom username/password combinations for the HTTP auth, or use the WordPress credentials.
-
-This doesn't touch any .htaccess files or change the WordPress core files. All the CSS/Images under /wp-admin/ are still accessible, just not the .php ones.
-
-If you enable HTTP authencation, it will add HTTP auth to wthe PHP files in /wp-admin/. It will also rename the login URL from /wp-login.php to whatever you want (/login/, /random-stuff/, etc)
+This plugin will hide /wp-admin/ when you aren't logged in. If a user isn't logged in and they attempt to access /wp-admin/ directly, they will be unable to and it will return a 404. It can also rename the login URL. Also, you can add HTTP authentication directly from WP admin and add custom username/password combinations for the HTTP auth, or use the WordPress credentials. This doesn't touch any .htaccess files or change the WordPress core files. All the CSS/Images under /wp-admin/ are still accessible, just not the .php ones. If you enable HTTP authencation, it will add HTTP auth to the PHP files in /wp-admin/
 
 
 Installation
@@ -64,3 +57,17 @@ Changelog
 > > Fixed a bug with user's with a index.php base
 > > Added stats for us to collect about about URL setup and server configuration for our users. This will let us make the plugin even better.
 > > Fixed bug for having private user management in WP Admin
+
+> 1.4.2 
+> > Bug fixes
+> > Added `admin-ajax.php` to the files that we permit to be access in wp-admin.
+
+> 1.6 
+> > Added way to get back into WP-ADMIN if locked out (See the FAQ)
+
+> 1.7
+> > Removed the stats that were collected to that we could understand the issues that users were having with the plugin.
+
+> 1.8 
+> > Finally discovered why so many users had HTTP auth errors. Fixed it to support almost 80% of hosts out there.
+> > If you still have problems, shoot me an email.

@@ -1,15 +1,13 @@
-<?php
+<?php if (! defined('ABSPATH')) exit;
 /*
 Plugin Name: Lockdown WordPress Admin
 Plugin URI: http://talkingwithsean.com/2011/01/lockdown-wp-admin/
 Description: Securing the WordPress Administration interface.
-Version: 1.4.1
+Version: 1.8
 Author: Sean Fisher
 Author URI: http://talkingwithsean.com/
-License: GPL v3
+License: GPL
 */
-
-
 
 //	This file name
 define('LD_FILE_NAME', __FILE__ );
@@ -17,9 +15,9 @@ define('LD_FILE_NAME', __FILE__ );
 /**
  *	This is the plugin that will add security to our site
  *
- *	@author Sean Fisher <me@tlksean.me>
- *	@version 1.1.2
- *	@license GPL v3
+ *	@author Sean Fisher <sean@talkingwithsean.com>
+ *	@version 1.8
+ *	@license GPL 
 **/
 class WP_LockAuth {
 	
@@ -29,7 +27,7 @@ class WP_LockAuth {
 	 * @param string
 	 * @access private
 	**/
-	private $ld_admin_version = '1.4';
+	private $ld_admin_version = '1.8';
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -68,8 +66,41 @@ class WP_LockAuth {
 		//	Hide the login form
 		$this->redo_login_form();
 		
-		//	We no longer update the options here, but rather when we call on the callback function from the menu.
-		//	More secure.
+		//	We no longer update the options here, but rather when we call on the callback function from the menu, more secure.
+	}
+	
+	/**
+	 * Get a username and password from the HTTP auth
+	 *
+	 * @return array|bool
+	**/
+	function get_http_auth_creds()
+	{
+		// Since PHP saves the HTTP Password in a bunch of places, we have to be able to test for all of them
+		$username = NULL;
+    	$password = NULL;
+		
+		// mod_php
+		if (isset($_SERVER['PHP_AUTH_USER'])) 
+		{
+		    $username = $_SERVER['PHP_AUTH_USER'];
+		    $password = $_SERVER['PHP_AUTH_PW'];
+		}
+
+		// most other servers
+		elseif ($_SERVER['HTTP_AUTHENTICATION'])
+		{
+			if (strpos(strtolower($_SERVER['HTTP_AUTHENTICATION']),'basic') === 0)
+			{
+				list($username,$password) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHENTICATION'], 6)));
+			}
+		}
+		
+		// Check them - if they're null a/o empty, they're invalid.
+		if ( is_null($username) OR is_null($password) OR empty($username) OR empty($password))
+			return FALSE;
+		else
+			return array('username' => $username, 'password' => $password);
 	}
 	
 	/**
@@ -110,7 +141,6 @@ class WP_LockAuth {
 				update_option('ld_private_users', $users);
 				
 				define('LD_WP_ADMIN', TRUE);
-				//wp_redirect( admin_url('admin.php?page=lockdown-private-users&updated=true'));
 				return;
 			}
 		}
@@ -170,6 +200,7 @@ class WP_LockAuth {
 		
 		//	---------------------------------------------------
 		//	They're updating.
+		//	---------------------------------------------------
 		if ( isset( $_POST['http_auth'] ) )
 			update_option('ld_http_auth', trim( strtolower( $_POST['http_auth'] ) ) );
 		else
@@ -223,43 +254,14 @@ class WP_LockAuth {
 	**/
 	private function inauth_headers()
 	{
+		//	Disable if there is a text file there.
+		if ( file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'disable_auth.txt'))
+			return;
+		
 		header('WWW-Authenticate: Basic realm="'.$this->relm.'"');
 		header('HTTP/1.0 401 Unauthorized');
 		echo '<h1>Authorization Required.</h1>';
 		exit;
-	}
-	
-	/**
-	 * Check for a HTTP auth session
-	 *
-	 * If they find one, we will setup the 'INTERNAL_AUTH_PASSED' constant.
-	 * If they failed, it will send the HTTP auth headers to get the username/
-	 * password.
-	 *
-	 * @uses self::inauth_headers() When we need the username/pass
-	 * @access public
-	**/
-	public function setup()
-	{
-		/* Check for values in $PHP_AUTH_USER and $PHP_AUTH_PW */
-		if ((!isset($_SERVER['PHP_AUTH_USER'])) || (!isset($_SERVER['PHP_AUTH_PW']))) {
-			$this->inauth_headers();
-		
-		} else if ((isset($_SERVER['PHP_AUTH_USER'])) && (isset($_SERVER['PHP_AUTH_PW']))){
-			
-			/* Values contain some values, so check to see if they're correct */
-			
-			if (($_SERVER['PHP_AUTH_USER'] != $this->current_user) || (md5($_SERVER['PHP_AUTH_PW']) != $this->current_pass)) {
-				 /* If either the username entered is incorrect, or the password entered is incorrect, send the headers causing dialog box to appear */
-				 $this->inauth_headers();
-				 
-			} else if (($_SERVER['PHP_AUTH_USER'] === $this->current_user) || ( md5($_SERVER['PHP_AUTH_PW'] ) === $this->current_pass)) {
-				
-				 /* if both values are correct, print success message */
-				 //	We're good here!
-				 define('INTERNAL_AUTH_PASSED', TRUE);
-			}
-		} 
 	}
 	
 	/**
@@ -285,12 +287,15 @@ class WP_LockAuth {
 	{
 		$opt = get_option('ld_hide_wp_admin');
 		
-		//	Nope!
+		//	Nope, they didn't enable it.
 		if ( $opt !== 'yep' )
+		{
+			$this->setup_http_area();
 			return;
+		}
 		
 		//	We're gonna hide it.
-		$no_check_files = array('async-upload.php');
+		$no_check_files = array('async-upload.php', 'admin-ajax.php', 'wp-app.php');
 		$no_check_files = apply_filters('no_check_files', $no_check_files);
 		
 		$explode = explode('/', $_SERVER['SCRIPT_FILENAME'] );
@@ -305,13 +310,28 @@ class WP_LockAuth {
 		if ( is_admin() )
 		{
 			//	Non logged in users.
-			if ( !is_user_logged_in() )
+			if ( ! is_user_logged_in() )
 			{
 				//	If they AREN'T logged in and they tried to access wp-admin
 				//	we'll just serve them a 404!
 				status_header(404);
-				require( get_404_template() );
+				$four_tpl = get_404_template();
+				if ( empty($four_tpl) OR !file_exists($four_tpl) )
+				{
+					//	We're gonna try and get TwentyTen's one
+					$twenty_ten_tpl = WP_CONTENT_DIR . '/themes/twentyten/404.php';
+					if (file_exists($twenty_ten_tpl))
+						require($twenty_ten_tpl);
+					else
+						wp_die('404 - File not found!', '', array('response' => 404));
+				}
+				else
+				{
+					//	Their theme has a template!
+					require( $four_tpl );
+				}
 				
+				//	Either way, it's gonna stop right here.
 				exit;
 			}
 			
@@ -347,23 +367,23 @@ class WP_LockAuth {
 		//	We save what type of auth we're doing here.
 		$opt = get_option('ld_http_auth');
 		
+		// What type of auth are we doing?
 		switch( $opt )
 		{
 			//	HTTP auth is going to ask for their WordPress creds.
 			case('wp_creds');
-				
-				/* Check for values in $PHP_AUTH_USER and $PHP_AUTH_PW */
-				if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']))
-					$this->inauth_headers();
+				$creds = $this->get_http_auth_creds();
+				if (! $creds )
+					$this->inauth_headers(); // Invalid credentials
 				
 				//	Are they already logged in as this?
 				$current_uid = get_current_user_id();
 				
 				//	We fixed this for use with non WP-MS sites
-				$requested_user = get_user_by('login', $_SERVER['PHP_AUTH_USER']);
+				$requested_user = get_user_by('login', $creds['username']);
 				
 				//	Not a valid user.
-				if ( !$requested_user )
+				if (! $requested_user )
 					$this->inauth_headers();
 				
 				//	The correct User ID.
@@ -377,11 +397,11 @@ class WP_LockAuth {
 				}
 				
 				//	Attempt to sign them in if they aren't alerady
-				if ( !is_user_logged_in() ) :
+				if (! is_user_logged_in() ) :
 					//	Try it via wp_signon
 					$creds = array();
-					$creds['user_login'] = $_SERVER['PHP_AUTH_USER'];
-					$creds['user_password'] = $_SERVER['PHP_AUTH_PW'];
+					$creds['user_login'] = $creds['username'];
+					$creds['user_password'] = $creds['password'];
 					$creds['remember'] = true;
 					$user = wp_signon( $creds, false );
 					
@@ -392,30 +412,34 @@ class WP_LockAuth {
 				
 				//	They passed!
 				define('INTERNAL_AUTH_PASSED', TRUE);
-				break;
+			break;
 			
+			// Private list of users to check
 			case('private');
 				$users = $this->get_private_users();
 				
-				//	We want a user to exist
-				//	If nobody is found, we won't lock them out!
-				if ( !$users || !is_array( $users ) )
+				// We want a user to exist.
+				// If nobody is found, we won't lock them out!
+				if ( ! $users || ! is_array( $users ) )
 					return;
 				
 				//	Let's NOT lock everybody out
-				if ( count( $users ) === 0 )
+				if ( count( $users ) < 1 )
 					return;
 				
-				/* Check for values in $PHP_AUTH_USER and $PHP_AUTH_PW */
-				if ( !isset( $_SERVER['PHP_AUTH_USER'] ) || !isset( $_SERVER['PHP_AUTH_PW'] ) )
+				// Get the HTTP auth creds
+				$creds = $this->get_http_auth_creds();
+				
+				// Invalid creds
+				if (! $creds )
 					$this->inauth_headers();
 				
 				//	Did they enter a valid user?
-				if ( $this->user_array_check( $users, $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] ) )
+				if ( $this->user_array_check( $users, $creds['username'], $creds['password'] ) )
 				{
 					//	Yes!!
 					define('INTERNAL_AUTH_PASSED', TRUE);
-					$this->set_current_user( $users, $_SERVER['PHP_AUTH_USER'] );
+					$this->set_current_user( $users, $creds['username'] );
 					return;
 				}
 				else
@@ -425,7 +449,12 @@ class WP_LockAuth {
 					return;
 				}
 				
-				break;
+			break;
+			
+			// Unknown type of auth
+			default;
+				return FALSE;
+			break;
 		}
 		
 	}
@@ -439,7 +468,7 @@ class WP_LockAuth {
 	 * @param string $user The username to check for
 	 * @param string $pass The password to check for (plain text)
 	**/
-	function user_array_check( $array, $user, $pass )
+	public function user_array_check( $array, $user, $pass )
 	{
 		foreach( $array as $key => $val )
 		{
@@ -455,7 +484,7 @@ class WP_LockAuth {
 	 *
 	 * @access private
 	**/
-	function set_current_user( $array, $user )
+	private function set_current_user( $array, $user )
 	{
 		foreach( $array as $key => $val )
 		{
@@ -484,11 +513,6 @@ class WP_LockAuth {
 	{
 		//	Update the options
 		$this->update_options();
-		
-		//	The stats
-		$check_stats_sent = get_transient('ld_send_stats');
-		if ( !$check_stats_sent )
-			$this->send_stats();
 		
 		//	The UI
 		require_once( dirname( __FILE__ ) . '/admin.php' );
@@ -584,63 +608,6 @@ class WP_LockAuth {
 	{
 		return str_replace('wp-login.php', $this->login_base, $str);
 	}
-	
-	/**
-	 * Send stats
-	 *
-	 * Send anyomous stats to help out the development of the plugin.
-	 * This should be pretty temporary.
-	 * @access private
-	**/
-	public function send_stats()
-	{
-		global $wp_version;
-		
-		$to_post = array(
-			'ld_admin_version'	=>	$this->ld_admin_version,
-			'server'			=>	$_SERVER['HTTP_HOST'],
-			'request_url'		=>	$_SERVER['REQUEST_URI'],
-			'wordpress_version'	=>	$wp_version,
-			'url'				=>	get_bloginfo( 'url' ),
-			//	I reconsidered this..
-			//	'admin_email'		=>	get_bloginfo('admin_email'),
-			'charset'			=>	get_bloginfo('charset'),
-			'login_base'		=>	$this->login_base,
-			'ld_http_auth'		=>	get_option('ld_http_auth'),
-			'ld_hide_wp_admin'	=>	get_option('ld_hide_wp_admin'),
-			'permalink_structure'	=>	get_option('permalink_structure'),
-			'server_software'		=> $_SERVER['SERVER_SOFTWARE'],
-			'query_string'			=> $_SERVER['QUERY_STRING'],
-			'wp_version'			=>	$wp_version,
-		);
-		
-		if ( function_exists('got_mod_rewrite '))
-			$to_post['got_mod_rewrite '] = got_mod_rewrite();
-		
-		$options = array(
-			'timeout' => ( ( defined('DOING_CRON') && DOING_CRON ) ? 30 : 3),
-			'body' => array( 'data' => serialize( $to_post ) ),
-			'user-agent' => 'WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' )
-		);
-
-		$raw_response = wp_remote_post('http://labs.talkingwithsean.com/lockdown-api/main/send/', $options);
-		
-		//	Set that we sent it
-		set_transient('ld_send_stats', 'true', 604800);
-		
-		//	What'd they respond?
-		if ( is_wp_error( $raw_response ) )
-			return FALSE;
-	
-		if ( 200 != $raw_response['response']['code'] )
-			return FALSE;
-	
-		$response = json_decode( unserialize( $raw_response['body'] ) );
-		
-		if ( !is_array( $response ) )
-			return FALSE;
-			
-	}
 }
 
 /**
@@ -650,8 +617,8 @@ class WP_LockAuth {
  *
  * @return void
  * @access private
- * @version 1.0
- * @see do_action() Called by the 'init' hook'
+ * @since 1.0
+ * @see do_action() Called by the 'init' action.
 **/
 function ld_setup_auth()
 {
@@ -662,3 +629,4 @@ function ld_setup_auth()
 add_action('init', 'ld_setup_auth');
 
 /* End of file: lockdown-wp-admin.php */
+/* Code is poetry. */
