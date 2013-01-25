@@ -17,8 +17,9 @@ if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE )
 }
 ?>
 	<p>We are going to help make WordPress a bit more secure.</p>
-	<p><a href="http://twitter.com/talkingwithsean"><img src="http://twitter-badges.s3.amazonaws.com/follow_me-c.png" width="160" height="27" /></a><br />
-		I tweet a lot of cool things and often post whenever I update this plugin. <a href="http://twitter.com/talkingwithsean">@talkingwithsean</a></p>
+	<p><a href="https://twitter.com/srtfisher" class="twitter-follow-button" data-show-count="false">Follow @srtfisher</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script><br />
+		I tweet a lot of cool things and often post whenever I update this plugin. <a href="http://twitter.com/srtfisher">@srtfisher</a></p>
 	<form method="POST" action="<?php echo admin_url('admin.php?page=lockdown-wp-admin'); ?>">
 		<?php
 	//	Nonces

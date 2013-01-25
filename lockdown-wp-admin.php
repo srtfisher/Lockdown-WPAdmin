@@ -1,11 +1,11 @@
 <?php if (! defined('ABSPATH')) exit;
 /*
 Plugin Name: Lockdown WordPress Admin
-Plugin URI: http://talkingwithsean.com/2011/01/lockdown-wp-admin/
+Plugin URI: http://seanfisher.co/2011/01/lockdown-wp-admin/
 Description: Securing the WordPress Administration interface.
-Version: 1.8
+Version: 1.9
 Author: Sean Fisher
-Author URI: http://talkingwithsean.com/
+Author URI: http://seanfisher.co/
 License: GPL
 */
 
@@ -15,49 +15,49 @@ define('LD_FILE_NAME', __FILE__ );
 /**
  *	This is the plugin that will add security to our site
  *
- *	@author Sean Fisher <sean@talkingwithsean.com>
- *	@version 1.8
- *	@license GPL 
+ *	@author		Sean Fisher <me@seanfisher.co>
+ *	@version	1.9
+ *	@license	GPL 
 **/
-class WP_LockAuth {
-	
+class WP_LockAuth
+{	
 	/**
 	 * The version of lockdown WP Admin
 	 *
 	 * @param string
 	 * @access private
 	**/
-	private $ld_admin_version = '1.8';
+	private $ld_admin_version = '1.9';
 	
 	/**
 	 * The HTTP Auth name for the protected area
 	 * Change this via calling the object, not by editing the file.
 	 *
-	 * @access public
-	 * @global string
+	 * @access	public
+	 * @global	string
 	**/
 	public $relm = "Secure Area";
 	
 	/**
 	 * The current user ID from our internal array
 	 *
-	 * @access private
+	 * @access	private
 	**/
 	private $current_user = FALSE;
 	
 	/**
 	 * The base to get the login url
 	 *
-	 * @access private
+	 * @access	private
 	**/
 	private $login_base = FALSE;
 	
 	function WP_LockAuth()
 	{
-		//	We don't like adding network wide WordPress plugins.
+		// We don't like adding network wide WordPress plugins.
 		require_once( dirname( __FILE__ ) .'/no-wpmu.php' );
 		
-		//	Add the action to setup the menu.
+		// Add the action to setup the menu.
 		add_action('admin_menu', array( &$this, 'add_admin_menu'));
 		
 		//	Setup the plugin.
@@ -65,8 +65,6 @@ class WP_LockAuth {
 		
 		//	Hide the login form
 		$this->redo_login_form();
-		
-		//	We no longer update the options here, but rather when we call on the callback function from the menu, more secure.
 	}
 	
 	/**
@@ -83,8 +81,8 @@ class WP_LockAuth {
 		// mod_php
 		if (isset($_SERVER['PHP_AUTH_USER'])) 
 		{
-		    $username = $_SERVER['PHP_AUTH_USER'];
-		    $password = $_SERVER['PHP_AUTH_PW'];
+		    $username = (isset($_SERVER['PHP_AUTH_USER'])) ? $_SERVER['PHP_AUTH_USER'] : NULL;
+		    $password = (isset($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : NULL;
 		}
 
 		// most other servers
@@ -110,7 +108,7 @@ class WP_LockAuth {
 	**/
 	function update_users()
 	{
-		if ( !isset( $_GET['page'] ) )
+		if (! isset( $_GET['page'] ) )
 			return;
 		
 		if ( $_GET['page'] !== 'lockdown-private-users' )
@@ -309,32 +307,10 @@ class WP_LockAuth {
 		//	We only will hide it if we are in admin (/wp-admin/)
 		if ( is_admin() )
 		{
-			//	Non logged in users.
+			// Non logged in users.
 			if ( ! is_user_logged_in() )
-			{
-				//	If they AREN'T logged in and they tried to access wp-admin
-				//	we'll just serve them a 404!
-				status_header(404);
-				$four_tpl = get_404_template();
-				if ( empty($four_tpl) OR !file_exists($four_tpl) )
-				{
-					//	We're gonna try and get TwentyTen's one
-					$twenty_ten_tpl = WP_CONTENT_DIR . '/themes/twentyten/404.php';
-					if (file_exists($twenty_ten_tpl))
-						require($twenty_ten_tpl);
-					else
-						wp_die('404 - File not found!', '', array('response' => 404));
-				}
-				else
-				{
-					//	Their theme has a template!
-					require( $four_tpl );
-				}
-				
-				//	Either way, it's gonna stop right here.
-				exit;
-			}
-			
+				$this->throw_404();
+						
 			//	Setup HTTP auth.
 			$this->setup_http_area();
 		}
@@ -579,21 +555,19 @@ class WP_LockAuth {
 		
 		//	Are they visiting wp-login.php?
 		if ( $super_base == 'wp-login.php')
-		{
-			status_header(404);
-			require( get_404_template() );
-			
-			exit;
-		}
+			$this->throw_404();
 		
 		//	Is this the "login" url?
 		if ( $base !== $this->login_base )
 			return FALSE;
 		
-		//	We dont' want a WP plugin caching this page
+		// We dont' want a WP plugin caching this page
 		@define('NO_CACHE', TRUE);
 		@define('WTC_IN_MINIFY', TRUE);
 		@define('WP_CACHE', FALSE);
+		
+		// Hook onto this
+		do_action('ld_login_page');
 		
 		include ABSPATH . "/wp-login.php";
 		exit;
@@ -607,6 +581,49 @@ class WP_LockAuth {
 	public function filter_wp_login( $str )
 	{
 		return str_replace('wp-login.php', $this->login_base, $str);
+	}
+	
+	/**
+	 * Launch and display the 404 page depending upon the template
+	 *
+	 * @param		void
+	 * @return		void
+	**/
+	public function throw_404()
+	{
+		// Admin Bar
+		add_filter('show_admin_bar', '__return_false');  
+		remove_action( 'admin_footer', 'wp_admin_bar_render', 10);  
+		remove_action('wp_head', 'wp_admin_bar_header', 10);
+		remove_action('wp_head', '_admin_bar_bump_cb', 10);
+		wp_dequeue_script( 'admin-bar' );
+		wp_dequeue_style( 'admin-bar' );
+		
+		
+		status_header(404);
+		$four_tpl = get_404_template();
+		
+		// Handle the admin bar
+		@define('APP_REQUEST', TRUE);
+		
+		if ( empty($four_tpl) OR ! file_exists($four_tpl) )
+		{
+			// We're gonna try and get TwentyTen's one
+			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentyten/404.php');
+			
+			if (file_exists($twenty_ten_tpl))
+				require($twenty_ten_tpl);
+			else
+				wp_die('404 - File not found!', '', array('response' => 404));
+		}
+		else
+		{
+			// Their theme has a template!
+			require( $four_tpl );
+		}
+		
+		// Either way, it's gonna stop right here.
+		exit;
 	}
 }
 
