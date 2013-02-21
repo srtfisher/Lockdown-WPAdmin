@@ -2,22 +2,24 @@
 Contributors: sean212
 Donate link: http://seanfisher.co/donate/
 Link: http://seanfisher.co/lockdown-wp-admin/
-Tags: security, wp-admin, login, hide login, rename login, http auth, 404, lockdown, srtfisher, secure
-Requires at least: 3.0
-Tested up to: 3.4.2
-Stable tag: 1.9
+Tags: security, secure, lockdown, vulnerability, website security, wp-admin, login, hide login, rename login, http auth, 404, lockdown, srtfisher, secure
+Requires at least: 3.3
+Tested up to: 3.5.1
+Stable tag: 2.0
 
-This plugin will lockdown WP Admin. It can hide wp-admin and wp-login as well as add HTTP auth to the login system. It can change the login URL.
+Lockdown WP Admin conceals the administration and login screen from intruders. It can hide WordPress Admin (/wp-admin/) and and login (/wp-login.php) as well as add HTTP authentication to the login system. We can also change the login URL from wp-login.php to whatever you'd like: /login, /log-in-here, etc.
 
 == Description ==
 
-This plugin will hide /wp-admin/ when you aren't logged in. If a user isn't logged in and they attempt to access /wp-admin/ directly, they will be unable to and it will return a 404. It can also rename the login URL.
+This plugin will hide WordPress Admin (/wp-admin/) when a user isn't logged in. If a user isn't logged in and they attempt to access WP Admin directly, they will be unable to and it will return a 404. It can also rename the login URL.
 
-Also, you can add HTTP authentication directly from WP admin and add custom username/password combinations for the HTTP auth, or use the WordPress credentials.
+Also, you can add HTTP authentication directly from WP Admin and add custom username/password combinations for the HTTP auth or use the WordPress credentials.
 
 This doesn't touch any .htaccess files or change the WordPress core files. All the CSS/Images under /wp-admin/ are still accessible, just not the .php ones.
 
-If you enable HTTP authencation, it will add HTTP auth to the PHP files in /wp-admin/
+If you enable HTTP authencation, it will add HTTP authentication to the PHP files in /wp-admin/.
+
+To contribute to the development, check out [the GitHub Repository](https://github.com/srtfisher/Lockdown-WPAdmin).
 
 == Installation ==
 1. Upload `/lockdown-wp-admin/` to the `/wp-content/plugins/` directory
@@ -25,13 +27,13 @@ If you enable HTTP authencation, it will add HTTP auth to the PHP files in /wp-a
 3. Navigate to the "Lockdown WP" menu
 
 == Frequently Asked Questions ==
-= How can we add files to the whitelist to hide from the public eye? We want to have AJAX and use a custom file, but we can't because it hides it from the public. =
+= How can we add files to the white list to hide from the public eye? We want to have AJAX and use a custom file, but we can't because it hides it from the public. =
 
 You can add a file using the 'no_check_files' filter. Use this:
 	`
 	function add_my_cool_filter($data)
 	{
-		//	You have to accept the $data argument or else it will cause a system meltdown ;)
+		// You have to accept the $data argument or else it will cause a system meltdown ;)
 		$data[] = 'my-file-name.php';	//	JUST the file name.
 		return $data;
 	}
@@ -40,9 +42,9 @@ You can add a file using the 'no_check_files' filter. Use this:
 
 Simple.
 
-= How can I get back in if the plugin locked me out? =
+= How can I get back in if Lockdown WP Admin locked me out? =
 
-You can create a .txt file named 'disable_auth.txt' in your wp-content/plugins/lockdown-wp-admin/ folder (The file location would be /wp-content/plugins/lockdown-wp-admin/disable_auth.txt). We don't care about the content but that will disable the HTTP Auth and whatever was locking you out of your site.
+You can create a .txt file named 'disable_auth.txt' in your `wp-content/plugins/lockdown-wp-admin/` folder (The file location would be `/wp-content/plugins/lockdown-wp-admin/disable_auth.txt`). We don't care about the content but that will disable the HTTP Auth and whatever was locking you out of your site.
 
 == Changelog ==
 = 1.0 =
@@ -78,8 +80,13 @@ You can create a .txt file named 'disable_auth.txt' in your wp-content/plugins/l
 * Removed the stats that were collected to that we could understand the issues that users were having with the plugin.
 
 = 1.8 =
-* Finally discovered why so many users had HTTP auth errors. Fixed it to support almost 80% of hosts out there.
+* Finally discovered why so many users had HTTP authentication errors. Fixed it to support almost 80% of hosts out there.
 * If you still have problems, shoot me an email.
 
 = 1.9 =
 A very late update, sorry! Worked to fix many issues with the admin bar and the "get_current_screen()" error. If you still see issues, please contact me!
+
+= 2.0 =
+* Provided a system dump to help in debugging issues that may arise.
+* Fixes a issues on the 404 page under 3.5.1 (`get_current_screen()`)
+* Cleanup, cleanup!
