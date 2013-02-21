@@ -22,7 +22,7 @@ If you enable HTTP authentication, it will add HTTP authentication to the PHP fi
 **How can we add files to the white list to hide from the public eye? We want to have AJAX and use a custom file, but we can't because it hides it from the public.**
 
 You can add a file using the 'no_check_files' filter. Use this:
-`php
+```php
 <?php
 function add_my_cool_filter($data)
 {
@@ -32,7 +32,7 @@ function add_my_cool_filter($data)
 }
 add_filter('no_check_files', 'add_my_cool_filter');
 ?>
-`
+```
 
 Simple.
 
@@ -78,6 +78,7 @@ You can create a .txt file named 'disable_auth.txt' in your `wp-content/plugins/
 * If you still have problems, shoot me an email.
 
 1.9
+
 A very late update, sorry! Worked to fix many issues with the admin bar and the "get_current_screen()" error. If you still see issues, please contact me!
 
 2.0
