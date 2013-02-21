@@ -17,7 +17,7 @@ Also, you can add HTTP authentication directly from WP Admin and add custom user
 
 This doesn't touch any .htaccess files or change the WordPress core files. All the CSS/Images under /wp-admin/ are still accessible, just not the .php ones.
 
-If you enable HTTP authencation, it will add HTTP authentication to the PHP files in /wp-admin/.
+If you enable HTTP authentication, it will add HTTP authentication to the PHP files in /wp-admin/.
 
 To contribute to the development, check out [the GitHub Repository](https://github.com/srtfisher/Lockdown-WPAdmin).
 

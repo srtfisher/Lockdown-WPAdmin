@@ -1,23 +1,24 @@
 <?php if (! defined('ABSPATH')) exit;
 /*
-Plugin Name: Lockdown WordPress Admin
-Plugin URI: http://seanfisher.co/2011/01/lockdown-wp-admin/
-Description: Securing the WordPress Administration interface.
-Version: 1.9
+Plugin Name: Lockdown WP Admin
+Plugin URI: http://seanfisher.co/lockdown-wp-admin/
+Donate link: http://seanfisher.co/donate/
+Description: Securing the WordPress Administration interface by concealing the administration dashboard and changing the login page URL.
+Version: 2.0
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
 */
 
-//	This file name
+// This file name
 define('LD_FILE_NAME', __FILE__ );
 
 /**
- *	This is the plugin that will add security to our site
+ * This is the plugin that will add security to our site
  *
- *	@author		Sean Fisher <me@seanfisher.co>
- *	@version	1.9
- *	@license	GPL 
+ * @author   Sean Fisher <me@seanfisher.co>
+ * @version  1.9
+ * @license   GPL 
 **/
 class WP_LockAuth
 {	
@@ -27,7 +28,7 @@ class WP_LockAuth
 	 * @param string
 	 * @access private
 	**/
-	private $ld_admin_version = '1.9';
+	private $ld_admin_version = 2.0;
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -52,18 +53,18 @@ class WP_LockAuth
 	**/
 	private $login_base = FALSE;
 	
-	function WP_LockAuth()
+	public function __construct()
 	{
 		// We don't like adding network wide WordPress plugins.
 		require_once( dirname( __FILE__ ) .'/no-wpmu.php' );
 		
 		// Add the action to setup the menu.
-		add_action('admin_menu', array( &$this, 'add_admin_menu'));
+		add_action('admin_menu', array( $this, 'add_admin_menu'));
 		
-		//	Setup the plugin.
+		// Setup the plugin.
 		$this->setup_hide_admin();
 		
-		//	Hide the login form
+		// Hide the login form
 		$this->redo_login_form();
 	}
 	
@@ -72,11 +73,11 @@ class WP_LockAuth
 	 *
 	 * @return array|bool
 	**/
-	function get_http_auth_creds()
+	public function get_http_auth_creds()
 	{
 		// Since PHP saves the HTTP Password in a bunch of places, we have to be able to test for all of them
 		$username = NULL;
-    	$password = NULL;
+		$password = NULL;
 		
 		// mod_php
 		if (isset($_SERVER['PHP_AUTH_USER'])) 
@@ -106,7 +107,7 @@ class WP_LockAuth
 	 *
 	 * @access private
 	**/
-	function update_users()
+	public function update_users()
 	{
 		if (! isset( $_GET['page'] ) )
 			return;
@@ -180,7 +181,7 @@ class WP_LockAuth
 	 *
 	 * @access private
 	**/
-	function update_options()
+	public function update_options()
 	{
 		if ( !isset( $_GET['page'] ) )
 			return;
@@ -267,7 +268,7 @@ class WP_LockAuth
 	 *
 	 * @access private
 	**/
-	function get_private_users()
+	public function get_private_users()
 	{
 		$opt = get_option('ld_private_users');
 		if ( !is_array( $opt ) )
@@ -281,7 +282,7 @@ class WP_LockAuth
 	 *
 	 * @access void
 	**/
-	function setup_hide_admin()
+	public function setup_hide_admin()
 	{
 		$opt = get_option('ld_hide_wp_admin');
 		
@@ -298,20 +299,21 @@ class WP_LockAuth
 		
 		$explode = explode('/', $_SERVER['SCRIPT_FILENAME'] );
 		$file = end( $explode );
-    	if ( in_array( $file, $no_check_files ) )
-    	{
+	    	
+	    	if ( in_array( $file, $no_check_files ) )
+	    	{
 			define('INTERNAL_AUTH_PASSED', TRUE);
 			return;
 		}
     	
-		//	We only will hide it if we are in admin (/wp-admin/)
+		// We only will hide it if we are in admin (/wp-admin/)
 		if ( is_admin() )
 		{
 			// Non logged in users.
 			if ( ! is_user_logged_in() )
 				$this->throw_404();
 						
-			//	Setup HTTP auth.
+			// Setup HTTP auth.
 			$this->setup_http_area();
 		}
 	}
@@ -321,7 +323,7 @@ class WP_LockAuth
 	 *
 	 * @return string JUST the file name
 	**/
-	function get_file()
+	public function get_file()
 	{
 		//	We're gonna hide it.
 		$no_check_files = array('async-upload.php');
@@ -338,7 +340,7 @@ class WP_LockAuth
 	 *
 	 * @access private
 	**/
-	function setup_http_area()
+	public function setup_http_area()
 	{
 		//	We save what type of auth we're doing here.
 		$opt = get_option('ld_http_auth');
@@ -347,7 +349,7 @@ class WP_LockAuth
 		switch( $opt )
 		{
 			//	HTTP auth is going to ask for their WordPress creds.
-			case('wp_creds');
+			case 'wp_creds' :
 				$creds = $this->get_http_auth_creds();
 				if (! $creds )
 					$this->inauth_headers(); // Invalid credentials
@@ -391,7 +393,7 @@ class WP_LockAuth
 			break;
 			
 			// Private list of users to check
-			case('private');
+			case 'private' :
 				$users = $this->get_private_users();
 				
 				// We want a user to exist.
@@ -428,7 +430,7 @@ class WP_LockAuth
 			break;
 			
 			// Unknown type of auth
-			default;
+			default :
 				return FALSE;
 			break;
 		}
@@ -474,7 +476,7 @@ class WP_LockAuth
 	 *
 	 * @acces private
 	**/
-	function add_admin_menu()
+	public function add_admin_menu()
 	{
 		add_menu_page('Lockdown WP', 'Lockdown WP', 'manage_options', 'lockdown-wp-admin', array( &$this, 'admin_callback'));
 		add_submenu_page( 'lockdown-wp-admin', 'Private Users', 'Private Users', 'manage_options', 'lockdown-private-users',  array( &$this, 'sub_admin_callback'));
@@ -485,7 +487,7 @@ class WP_LockAuth
 	 *
 	 * You need the 'manage_options' capability to get here.
 	**/
-	function admin_callback()
+	public function admin_callback()
 	{
 		//	Update the options
 		$this->update_options();
@@ -499,7 +501,7 @@ class WP_LockAuth
 	 *
 	 * You need the 'manage_options' capability to get here.
 	**/
-	function sub_admin_callback()
+	public function sub_admin_callback()
 	{
 		//	Update the users options
 		$this->update_users();
@@ -598,7 +600,6 @@ class WP_LockAuth
 		remove_action('wp_head', '_admin_bar_bump_cb', 10);
 		wp_dequeue_script( 'admin-bar' );
 		wp_dequeue_style( 'admin-bar' );
-		
 		
 		status_header(404);
 		$four_tpl = get_404_template();
