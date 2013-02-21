@@ -592,7 +592,7 @@ class WP_LockAuth
 	public function throw_404()
 	{
 		// Admin Bar
-		add_filter('show_admin_bar', '__return_false');  
+		add_filter('show_admin_bar', '__return_false', 900);  
 		remove_action( 'admin_footer', 'wp_admin_bar_render', 10);  
 		remove_action('wp_head', 'wp_admin_bar_header', 10);
 		remove_action('wp_head', '_admin_bar_bump_cb', 10);
