@@ -116,7 +116,7 @@ class WP_LockAuth
 		if ( $_GET['page'] !== 'lockdown-private-users' )
 			return;
 		
-		//	Nonce
+		// Nonce
 		if ( !isset( $_REQUEST['_wpnonce'] ) )
 			return;
 		
@@ -124,9 +124,7 @@ class WP_LockAuth
 		if ( !wp_verify_nonce( $nonce, 'lockdown-wp-admin' ) )
 			wp_die('Security error, please try again.');
 		
-		//	---------------------------------------------------
-		
-		//	Add a user
+		// Add a user
 		if ( isset( $_POST['private_username'] ) && isset( $_POST['private_password'] ) )
 		{
 			if ( $_POST['private_username'] !== '' && $_POST['private_password'] !== '' )
@@ -151,7 +149,7 @@ class WP_LockAuth
 			}
 		}
 		
-		//	Deleting a user.
+		// Deleting a user.
 		if ( isset( $_GET['delete'] ) )
 		{
 			//	Delete the user.
