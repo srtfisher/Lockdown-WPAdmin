@@ -25,7 +25,7 @@ class WP_LockAuth
 	/**
 	 * The version of lockdown WP Admin
 	 *
-	 * @param string
+	 * @global string
 	 * @access private
 	**/
 	private $ld_admin_version = 2.0;
@@ -37,7 +37,7 @@ class WP_LockAuth
 	 * @access	public
 	 * @global	string
 	**/
-	public $relm = "Secure Area";
+	public $relm = 'Secure Area';
 	
 	/**
 	 * The current user ID from our internal array
@@ -56,7 +56,8 @@ class WP_LockAuth
 	public function __construct()
 	{
 		// We don't like adding network wide WordPress plugins.
-		require_once( dirname( __FILE__ ) .'/no-wpmu.php' );
+		if (! class_exists('Disable_WPMS_Plugin_LD'))
+			require_once( dirname( __FILE__ ) .'/no-wpmu.php' );
 		
 		// Add the action to setup the menu.
 		add_action('admin_menu', array( $this, 'add_admin_menu'));
@@ -130,11 +131,17 @@ class WP_LockAuth
 		{
 			if ( $_POST['private_username'] !== '' && $_POST['private_password'] !== '' )
 			{
-				//	Adding a user.
+				// Adding a user
 				$users = $this->get_private_users();
 				$add['user'] = sanitize_user( $_POST['private_username'] );
 				$add['pass'] = trim( md5( $_POST['private_password'] ) );
 				
+				// See if it exists
+				if ($this->user_exists($users, $add['user'])) :
+					define('LD_ERROR', 'username-exists');
+					return;
+				endif;
+
 				$users[] = $add;
 				
 				update_option('ld_private_users', $users);
@@ -282,18 +289,15 @@ class WP_LockAuth
 	 *
 	 * @access void
 	**/
-	public function setup_hide_admin()
+	protected function setup_hide_admin()
 	{
 		$opt = get_option('ld_hide_wp_admin');
 		
 		//	Nope, they didn't enable it.
 		if ( $opt !== 'yep' )
-		{
-			$this->setup_http_area();
-			return;
-		}
+			return $this->setup_http_area();
 		
-		//	We're gonna hide it.
+		// We're gonna hide it.
 		$no_check_files = array('async-upload.php', 'admin-ajax.php', 'wp-app.php');
 		$no_check_files = apply_filters('no_check_files', $no_check_files);
 		
@@ -338,9 +342,9 @@ class WP_LockAuth
 	 *
 	 * Here, we only check if it's enabled
 	 *
-	 * @access private
+	 * @access protected
 	**/
-	public function setup_http_area()
+	protected function setup_http_area()
 	{
 		//	We save what type of auth we're doing here.
 		$opt = get_option('ld_http_auth');
@@ -374,7 +378,7 @@ class WP_LockAuth
 					return;
 				}
 				
-				//	Attempt to sign them in if they aren't alerady
+				//	Attempt to sign them in if they aren't already
 				if (! is_user_logged_in() ) :
 					//	Try it via wp_signon
 					$creds = array();
@@ -415,16 +419,13 @@ class WP_LockAuth
 				//	Did they enter a valid user?
 				if ( $this->user_array_check( $users, $creds['username'], $creds['password'] ) )
 				{
-					//	Yes!!
 					define('INTERNAL_AUTH_PASSED', TRUE);
 					$this->set_current_user( $users, $creds['username'] );
 					return;
 				}
 				else
 				{
-					//	Nope
-					$this->inauth_headers();
-					return;
+					return $this->inauth_headers();
 				}
 				
 			break;
@@ -432,21 +433,20 @@ class WP_LockAuth
 			// Unknown type of auth
 			default :
 				return FALSE;
-			break;
 		}
 		
 	}
 	/**
 	 * Check an internal array of users against a passed user and pass
 	 *
-	 * @access public
+	 * @access protected
 	 * @return bool
 	 *
 	 * @param array $array The array of users
 	 * @param string $user The username to check for
 	 * @param string $pass The password to check for (plain text)
 	**/
-	public function user_array_check( $array, $user, $pass )
+	protected function user_array_check( $array, $user, $pass )
 	{
 		foreach( $array as $key => $val )
 		{
@@ -456,11 +456,33 @@ class WP_LockAuth
 		
 		return FALSE;
 	}
+
+	/**
+	 * See if a user exists in the array
+	 *
+	 * @access protected
+	 * @return boolean
+	 * @param array Array of users
+	 * @param string
+	 */
+	protected function user_exists($array, $user)
+	{
+		if (count($array) == 0) return FALSE;
+
+		foreach ($array as $k => $v) :
+			if ($v['user'] == $user)
+				return TRUE;
+		endforeach;
+
+		return FALSE;
+	}
 	
 	/**
 	 * Set the current user
 	 *
 	 * @access private
+	 * @param array
+	 * @param integer
 	**/
 	private function set_current_user( $array, $user )
 	{
@@ -478,8 +500,8 @@ class WP_LockAuth
 	**/
 	public function add_admin_menu()
 	{
-		add_menu_page('Lockdown WP', 'Lockdown WP', 'manage_options', 'lockdown-wp-admin', array( &$this, 'admin_callback'));
-		add_submenu_page( 'lockdown-wp-admin', 'Private Users', 'Private Users', 'manage_options', 'lockdown-private-users',  array( &$this, 'sub_admin_callback'));
+		add_menu_page('Lockdown WP', 'Lockdown WP', 'manage_options', 'lockdown-wp-admin', array( $this, 'admin_callback'));
+		add_submenu_page( 'lockdown-wp-admin', 'Private Users', 'Private Users', 'manage_options', 'lockdown-private-users',  array( $this, 'sub_admin_callback'));
 	}
 	
 	/**
@@ -503,12 +525,12 @@ class WP_LockAuth
 	**/
 	public function sub_admin_callback()
 	{
-		//	Update the users options
+		// Update the users options
 		$this->update_users();
 		
-		//	The UI
+		// The UI
 		$private_users = $this->get_private_users();
-		require_once( dirname( __FILE__ ) . '/admin-private-users.php' );
+		require_once( __DIR__ . '/admin-private-users.php' );
 	}
 	
 	/**
@@ -521,7 +543,7 @@ class WP_LockAuth
 		$login_base = get_option('ld_login_base');
 		
 		//	It's not enabled.
-		if ( $login_base == NULL || !$login_base || $login_base == '' )
+		if ( $login_base == NULL || ! $login_base || $login_base == '' )
 			return;
 		
 		$this->login_base = $login_base;
@@ -640,8 +662,9 @@ class WP_LockAuth
 **/
 function ld_setup_auth()
 {
-	//	Setup the object.
-	$auth_obj = new WP_LockAuth();
+	// Instantiate the object
+	$class = apply_filters('ld_class', 'WP_LockAuth');
+	$auth_obj = new $class();
 }
 
 add_action('init', 'ld_setup_auth');

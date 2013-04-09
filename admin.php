@@ -2,29 +2,25 @@
 <div class="wrap">
 	<div id="icon-options-general" class="icon32"></div>
 	<h2>Lockdown WordPress Admin</h2>
-	<?php if ( defined('LD_WP_ADMIN') && LD_WP_ADMIN == TRUE ) { ?>
+	<?php if ( defined('LD_WP_ADMIN') && LD_WP_ADMIN == TRUE ) : ?>
 	<div class="updated fade">
 		<p>Options updated!</p>
 	</div>
-	<?php } 
-if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE )
-{
-	?>
+	<?php endif;
+if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
 	<div class="updated fade">
 		<p>You can't make that your URL Base! </p>
 	</div>
-	<?php
-}
-?>
+<?php endif; ?>
+
 	<p>We are going to help make WordPress a bit more secure.</p>
 	<p><a href="https://twitter.com/srtfisher" class="twitter-follow-button" data-show-count="false">Follow @srtfisher</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script><br />
-		I tweet a lot of cool things and often post whenever I update this plugin. <a href="http://twitter.com/srtfisher">@srtfisher</a></p>
+		I tweet a lot of things and often post whenever I update this plugin. You should follow me <a href="http://twitter.com/srtfisher">@srtfisher</a></p>
+	
 	<form method="POST" action="<?php echo admin_url('admin.php?page=lockdown-wp-admin'); ?>">
-		<?php
-	//	Nonces
-	wp_nonce_field('lockdown-wp-admin');
-	?>
+		
+		<?php wp_nonce_field('lockdown-wp-admin'); ?>
 		<h3>Hide WP Admin</h3>
 		<p>We can "hide" WordPress's administration interface from the public. If you enable this, when you access <code><?php echo admin_url(); ?></code> when you <strong>aren't</strong> logged in, you will recieve a <a href="http://en.wikipedia.org/wiki/HTTP_404">404 error page</a> instead of redirecting to the login page.</p>
 		<label>
@@ -45,7 +41,11 @@ $url = wp_guess_url() . '/'. $this->login_base;
 		<p>Your current login URL is <code><a href="<?php echo $url; ?>"><?php echo $url; ?></a></code>.</p>
 		<blockquote>
 			<h4>Please Note Something!</h4>
-			<p>If you are using a cache plugin (WTC, WP Super Cache, etc), you need to enable it to not cache the above base. That means (for most caching plugins) adding whatever you enter into the box above into your plugins Caching Whitelist, that is the list of URLs that your plugin doesn't cache. If you have any questions, tweet me @talkingwithsean.</p>
+			<p>If you are using a cache plugin (WTC, WP Super Cache, etc), you need to enable it
+				to not cache the above base. That means (for most caching plugins) adding
+				whatever you enter into the box above into your plugins Caching Whitelist, that
+				is the list of URLs that your plugin doesn't cache. If you have any questions, tweet
+				me <a href="http://twitter.com/srtfisher">@srtfisher</a>.</p>
 		</blockquote>
 		<h3>HTTP Authentication</h3>
 		<p>Please read about HTTP Authentication on <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">http://en.wikipedia.org/wiki/Basic_access_authentication</a>.</p>
