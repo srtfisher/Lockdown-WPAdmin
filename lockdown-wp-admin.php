@@ -615,7 +615,12 @@ class WP_LockAuth
 	**/
 	public function throw_404()
 	{
-		// Admin Bar
+		// Change WP Query
+		global $wp_query;
+		$wp_query->set_404();
+		status_header(404);
+
+		// Disable that pesky Admin Bar
 		add_filter('show_admin_bar', '__return_false', 900);  
 		remove_action( 'admin_footer', 'wp_admin_bar_render', 10);  
 		remove_action('wp_head', 'wp_admin_bar_header', 10);
@@ -623,16 +628,17 @@ class WP_LockAuth
 		wp_dequeue_script( 'admin-bar' );
 		wp_dequeue_style( 'admin-bar' );
 		
-		status_header(404);
+		// Template
 		$four_tpl = get_404_template();
-		
+
 		// Handle the admin bar
 		@define('APP_REQUEST', TRUE);
+		@define('DOING_AJAX', TRUE);
 		
 		if ( empty($four_tpl) OR ! file_exists($four_tpl) )
 		{
 			// We're gonna try and get TwentyTen's one
-			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentyten/404.php');
+			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentytwelve/404.php');
 			
 			if (file_exists($twenty_ten_tpl))
 				require($twenty_ten_tpl);
