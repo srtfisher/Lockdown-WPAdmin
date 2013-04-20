@@ -528,7 +528,7 @@ class WP_LockAuth
 		
 		// The UI
 		$private_users = $this->get_private_users();
-		require_once( __DIR__ . '/admin-private-users.php' );
+		require_once( dirname( __FILE__ ) . '/admin-private-users.php' );
 	}
 	
 	/**
