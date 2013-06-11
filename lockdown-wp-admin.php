@@ -299,7 +299,10 @@ class WP_LockAuth
 		$no_check_files = array('async-upload.php', 'admin-ajax.php', 'wp-app.php');
 		$no_check_files = apply_filters('no_check_files', $no_check_files);
 		
-		$explode = explode('/', $_SERVER['SCRIPT_FILENAME'] );
+		$script_filename = empty($_SERVER['SCRIPT_FILENAME'])
+			? $_SERVER['PATH_TRANSLATED']
+			: $_SERVER['SCRIPT_FILENAME'];
+		$explode = explode('/', $script_filename);
 		$file = end( $explode );
 	    	
 	    	if ( in_array( $file, $no_check_files ) )
@@ -331,7 +334,10 @@ class WP_LockAuth
 		$no_check_files = array('async-upload.php');
 		$no_check_files = apply_filters('no_check_files', $no_check_files);
 		
-		$explode = explode('/', $_SERVER['SCRIPT_FILENAME'] );
+		$script_filename = empty($_SERVER['SCRIPT_FILENAME'])
+			? $_SERVER['PATH_TRANSLATED']
+			: $_SERVER['SCRIPT_FILENAME'];
+		$explode = explode('/', $script_filename );
 		return end( $explode );
 	}
 	
