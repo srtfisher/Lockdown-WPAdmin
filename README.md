@@ -86,6 +86,6 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 * Fixes a issues on the 404 page under 3.5.1 (`get_current_screen()`)
 * Cleanup, cleanup!
 
-2.0.1
+2.0.1 and 2.0.2
 
 Tiny bug fix.
