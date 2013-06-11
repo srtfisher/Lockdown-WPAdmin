@@ -4,7 +4,7 @@ Plugin Name: Lockdown WP Admin
 Plugin URI: http://seanfisher.co/lockdown-wp-admin/
 Donate link: http://seanfisher.co/donate/
 Description: Securing the WordPress Administration interface by concealing the administration dashboard and changing the login page URL.
-Version: 2.0.1
+Version: 2.0.2
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
@@ -28,7 +28,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	private $ld_admin_version = 2.0;
+	public $ld_admin_version = "2.0.2";
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -77,8 +77,7 @@ class WP_LockAuth
 	public function get_http_auth_creds()
 	{
 		// Since PHP saves the HTTP Password in a bunch of places, we have to be able to test for all of them
-		$username = NULL;
-		$password = NULL;
+		$username = $password = NULL;
 		
 		// mod_php
 		if (isset($_SERVER['PHP_AUTH_USER'])) 
@@ -258,7 +257,7 @@ class WP_LockAuth
 	**/
 	private function inauth_headers()
 	{
-		//	Disable if there is a text file there.
+		// Disable if there is a text file there.
 		if ( file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'disable_auth.txt'))
 			return;
 		
@@ -330,7 +329,7 @@ class WP_LockAuth
 	**/
 	public function get_file()
 	{
-		//	We're gonna hide it.
+		// We're gonna hide it.
 		$no_check_files = array('async-upload.php');
 		$no_check_files = apply_filters('no_check_files', $no_check_files);
 		
@@ -350,32 +349,32 @@ class WP_LockAuth
 	**/
 	protected function setup_http_area()
 	{
-		//	We save what type of auth we're doing here.
+		// We save what type of auth we're doing here.
 		$opt = get_option('ld_http_auth');
 		
 		// What type of auth are we doing?
 		switch( $opt )
 		{
-			//	HTTP auth is going to ask for their WordPress creds.
+			// HTTP auth is going to ask for their WordPress creds.
 			case 'wp_creds' :
 				$creds = $this->get_http_auth_creds();
 				if (! $creds )
 					$this->inauth_headers(); // Invalid credentials
 				
-				//	Are they already logged in as this?
+				// Are they already logged in as this?
 				$current_uid = get_current_user_id();
 				
-				//	We fixed this for use with non WP-MS sites
+				// We fixed this for use with non WP-MS sites
 				$requested_user = get_user_by('login', $creds['username']);
 				
-				//	Not a valid user.
+				// Not a valid user.
 				if (! $requested_user )
 					$this->inauth_headers();
 				
-				//	The correct User ID.
+				// The correct User ID.
 				$requested_uid = (int) $requested_user->ID;
 				
-				//	Already logged in?
+				// Already logged in?
 				if ( $current_uid === $requested_uid )
 				{
 					define('INTERNAL_AUTH_PASSED', TRUE);
@@ -391,12 +390,12 @@ class WP_LockAuth
 					$creds['remember'] = true;
 					$user = wp_signon( $creds, false );
 					
-					//	In error :(
+					// In error
 					if ( is_wp_error($user) )
 						$this->inauth_headers();
 				endif;
 				
-				//	They passed!
+				// They passed!
 				define('INTERNAL_AUTH_PASSED', TRUE);
 			break;
 			
@@ -409,7 +408,7 @@ class WP_LockAuth
 				if ( ! $users || ! is_array( $users ) )
 					return;
 				
-				//	Let's NOT lock everybody out
+				// Let's NOT lock everybody out
 				if ( count( $users ) < 1 )
 					return;
 				
@@ -488,7 +487,7 @@ class WP_LockAuth
 	 * @param array
 	 * @param integer
 	**/
-	private function set_current_user( $array, $user )
+	protected function set_current_user( $array, $user )
 	{
 		foreach( $array as $key => $val )
 		{
@@ -515,10 +514,10 @@ class WP_LockAuth
 	**/
 	public function admin_callback()
 	{
-		//	Update the options
+		// Update the options
 		$this->update_options();
 		
-		//	The UI
+		// The UI
 		require_once( dirname( __FILE__ ) . '/admin.php' );
 	}	
 	
@@ -553,7 +552,7 @@ class WP_LockAuth
 		$this->login_base = $login_base;
 		unset( $login_base );
 		
-		//	Setup the filters for the new login form
+		// Setup the filters for the new login form
 		add_filter('wp_redirect', array( &$this, 'filter_wp_login'));
 		add_filter('network_site_url', array( &$this, 'filter_wp_login'));
 		add_filter('site_url', array( &$this, 'filter_wp_login'));
@@ -576,7 +575,7 @@ class WP_LockAuth
 		
 		list( $base, $query ) = explode( '?', $request_url, 2 );
 		
-		//	Remove trailing slash
+		// Remove trailing slash
 		$base = rtrim($base,"/");
 		$exp = explode( '/', $base, 2 );
 		$super_base = reset( $exp );
@@ -614,8 +613,8 @@ class WP_LockAuth
 	/**
 	 * Launch and display the 404 page depending upon the template
 	 *
-	 * @param		void
-	 * @return		void
+	 * @param   void
+	 * @return  void
 	**/
 	public function throw_404()
 	{
