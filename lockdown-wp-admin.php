@@ -573,7 +573,8 @@ class WP_LockAuth
 		$request_url = str_replace( $blog_url, '', $current_url );
 		$request_url = str_replace('index.php/', '', $request_url);
 		
-		list( $base, $query ) = explode( '?', $request_url, 2 );
+		$url_parts = explode( '?', $request_url, 2 );
+		$base = $url_parts[0];
 		
 		// Remove trailing slash
 		$base = rtrim($base,"/");
