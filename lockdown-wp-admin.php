@@ -641,7 +641,7 @@ class WP_LockAuth
 		remove_action('wp_head', '_admin_bar_bump_cb', 10);
 		wp_dequeue_script( 'admin-bar' );
 		wp_dequeue_style( 'admin-bar' );
-		
+
 		// Template
 		$four_tpl = get_404_template();
 
@@ -652,7 +652,7 @@ class WP_LockAuth
 		if ( empty($four_tpl) OR ! file_exists($four_tpl) )
 		{
 			// We're gonna try and get TwentyTen's one
-			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentytwelve/404.php');
+			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentythirteen/404.php');
 			
 			if (file_exists($twenty_ten_tpl))
 				require($twenty_ten_tpl);
