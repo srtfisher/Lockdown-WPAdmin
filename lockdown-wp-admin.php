@@ -28,7 +28,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	public $ld_admin_version = "2.0.2";
+	public $ld_admin_version = '2.0.2';
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -44,14 +44,14 @@ class WP_LockAuth
 	 *
 	 * @access	private
 	**/
-	private $current_user = FALSE;
+	protected $current_user = FALSE;
 	
 	/**
 	 * The base to get the login url
 	 *
 	 * @access	private
 	**/
-	private $login_base = FALSE;
+	protected $login_base = FALSE;
 	
 	public function __construct()
 	{

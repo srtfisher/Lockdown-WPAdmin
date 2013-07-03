@@ -36,7 +36,7 @@ if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
 			Say if you put "login" into the box, your new login URL will be <?php echo wp_guess_url(); ?>/login/.</em></label>
 		<?php
 global $auth_obj;
-$url = wp_guess_url() . '/'. $this->login_base;
+$url = home_url() . '/'. $this->login_base;
 ?>
 		<p>Your current login URL is <code><a href="<?php echo $url; ?>"><?php echo $url; ?></a></code>.</p>
 		<blockquote>
