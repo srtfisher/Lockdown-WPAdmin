@@ -91,8 +91,9 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 * Fixes a issues on the 404 page under 3.5.1 (`get_current_screen()`)
 * Cleanup, cleanup!
 
-= 2.0.2 =
+= 2.0.1 =
 * Bug fix by [Michal Krause](https://github.com/michal-krause)
 
-= 2.0.1 =
-* Tiny bug fix
+= 2.0.2 =
+* Query string detection bug fix by [James Bonham](http://wordpress.org/support/profile/jamesbonham)
+* Issues with WordPress in a sub-directory

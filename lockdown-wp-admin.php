@@ -684,7 +684,7 @@ function ld_setup_auth()
 	$auth_obj = new $class();
 }
 
-add_action('after_setup_theme', 'ld_setup_auth');
+add_action('init', 'ld_setup_auth');
 
 /* End of file: lockdown-wp-admin.php */
 /* Code is poetry. */
