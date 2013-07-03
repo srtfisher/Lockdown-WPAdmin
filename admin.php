@@ -33,7 +33,7 @@ if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
 			<input type="text" name="login_base" value="<?php echo $this->login_base; ?>" />
 			<br />
 			<em>This will change it from <?php echo wp_guess_url(); ?>/wp-login.php to whatever you put in this box. If you leave it <strong>black</strong>, it will be disabled.<br />
-			Say if you put "login" into the box, your new login URL will be <?php echo wp_guess_url(); ?>/login/.</em></label>
+			Say if you put "login" into the box, your new login URL will be <?php echo home_url(); ?>/login/.</em></label>
 		<?php
 global $auth_obj;
 $url = home_url() . '/'. $this->login_base;
