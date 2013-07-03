@@ -17,7 +17,7 @@ define('LD_FILE_NAME', __FILE__ );
  * This is the plugin that will add security to our site
  *
  * @author   Sean Fisher <me@seanfisher.co>
- * @version  1.9
+ * @version  2.0.2
  * @license   GPL 
 **/
 class WP_LockAuth
