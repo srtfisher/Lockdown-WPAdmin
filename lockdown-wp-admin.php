@@ -309,6 +309,13 @@ class WP_LockAuth
 			define('INTERNAL_AUTH_PASSED', TRUE);
 			return;
 		}
+
+		// Disable for WP-CLI
+		if ( defined('WP_CLI') AND WP_CLI )
+		{
+			define('INTERNAL_AUTH_PASSED', TRUE);
+			return;
+		}
     	
 		// We only will hide it if we are in admin (/wp-admin/)
 		if ( is_admin() )
