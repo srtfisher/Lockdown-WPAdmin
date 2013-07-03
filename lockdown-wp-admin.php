@@ -580,13 +580,17 @@ class WP_LockAuth
 		$request_url = str_replace( $blog_url, '', $current_url );
 		$request_url = str_replace('index.php/', '', $request_url);
 		
-		list( $base, $query ) = explode( '?', $request_url, 2 );
-		
+		$vars = explode( '?', $request_url, 2 );
+		if( count( $vars ) == 2 )
+			list( $base, $query ) = $vars;
+		else
+			$base = $vars[0];
+
 		// Remove trailing slash
 		$base = rtrim($base,"/");
 		$exp = explode( '/', $base, 2 );
-		$super_base = reset( $exp );
-		
+		$super_base = end( $exp );
+
 		//	Are they visiting wp-login.php?
 		if ( $super_base == 'wp-login.php')
 			$this->throw_404();
@@ -603,7 +607,7 @@ class WP_LockAuth
 		// Hook onto this
 		do_action('ld_login_page');
 		
-		include ABSPATH . "/wp-login.php";
+		include ABSPATH . '/wp-login.php';
 		exit;
 	}
 	
@@ -683,7 +687,7 @@ function ld_setup_auth()
 	$auth_obj = new $class();
 }
 
-add_action('init', 'ld_setup_auth');
+add_action('after_setup_theme', 'ld_setup_auth');
 
 /* End of file: lockdown-wp-admin.php */
 /* Code is poetry. */
