@@ -1,0 +1,20 @@
+{
+  "name": "srtfisher/lockdown-wp-admin",
+  "description": "WordPress Plugin to hide login and admin URLs when not logged into WordPress.",
+  "homepage": "http://wordpress.org/plugins/lockdown-wp-admin/",
+  "license": "GPL-2.0",
+  "type": "wp-cli",
+  "keywords": ["wordpress", "admin", "security"],
+  
+
+  "authors": [
+    {
+      "name": "Sean Fisher",
+      "homepage": "http://seanfisher.co/"
+    }
+  ],
+  "minimum-stability": "dev",
+  "config": {
+      "preferred-install": "dist"
+  }
+}
