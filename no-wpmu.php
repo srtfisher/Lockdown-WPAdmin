@@ -31,7 +31,7 @@ class Disable_WPMS_Plugin_LD
             $this->network_activate_error();
         }
 		
-		//	Default options
+		// Default options
 		update_option('ld_http_auth', 'none');
 		update_option('ld_hide_wp_admin', 'no');
 	}
@@ -43,7 +43,7 @@ class Disable_WPMS_Plugin_LD
 	**/
 	function network_activate_error()
 	{
-		//	De-activate the plugin
+		// De-activate the plugin
 		$active_plugins = (array) get_option('active_plugins');
 		$active_plugins_network = (array) get_site_option('active_sitewide_plugins');
 		
@@ -103,7 +103,7 @@ class Disable_WPMS_Plugin_LD
 	}
 }
 
-//	The object.
+// The object.
 $setup_no_wpmu = new Disable_WPMS_Plugin_LD();
 
 /* End of file: no-wpmu.php */

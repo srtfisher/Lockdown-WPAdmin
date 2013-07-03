@@ -151,7 +151,7 @@ class WP_LockAuth
 		// Deleting a user.
 		if ( isset( $_GET['delete'] ) )
 		{
-			//	Delete the user.
+			// Delete the user.
 			unset( $users );
 			$users = $this->get_private_users();
 			$to_delete = (int) $_GET['delete'];
@@ -163,7 +163,7 @@ class WP_LockAuth
 					if ( $key === $to_delete ) :
 						if( $this->current_user !== '' && $to_delete === $this->current_user )
 						{
-							//	They can't delete themselves!
+							// They can't delete themselves!
 							define('LD_ERROR', 'delete-self');
 							return;
 						}
@@ -196,14 +196,14 @@ class WP_LockAuth
 		if ( !isset( $_POST['did_update'] ) )
 			return;
 		
-		//	Nonce
+		// Nonce
 		$nonce = $_POST['_wpnonce'];
 		if (! wp_verify_nonce($nonce, 'lockdown-wp-admin') )
 			wp_die('Security error, please try again.');
 		
-		//	---------------------------------------------------
-		//	They're updating.
-		//	---------------------------------------------------
+		// ---------------------------------------------------
+		// They're updating.
+		// ---------------------------------------------------
 		if ( isset( $_POST['http_auth'] ) )
 			update_option('ld_http_auth', trim( strtolower( $_POST['http_auth'] ) ) );
 		else
@@ -243,7 +243,7 @@ class WP_LockAuth
 			}
 		}
 		
-		//	Redirect
+		// Redirect
 		define('LD_WP_ADMIN', TRUE);
 		return;
 	}
@@ -290,7 +290,7 @@ class WP_LockAuth
 	{
 		$opt = get_option('ld_hide_wp_admin');
 		
-		//	Nope, they didn't enable it.
+		// Nope, they didn't enable it.
 		if ( $opt !== 'yep' )
 			return $this->setup_http_area();
 		
@@ -388,9 +388,9 @@ class WP_LockAuth
 					return;
 				}
 				
-				//	Attempt to sign them in if they aren't already
+				// Attempt to sign them in if they aren't already
 				if (! is_user_logged_in() ) :
-					//	Try it via wp_signon
+					// Try it via wp_signon
 					$creds = array();
 					$creds['user_login'] = $creds['username'];
 					$creds['user_password'] = $creds['password'];
@@ -426,7 +426,7 @@ class WP_LockAuth
 				if (! $creds )
 					$this->inauth_headers();
 				
-				//	Did they enter a valid user?
+				// Did they enter a valid user?
 				if ( $this->user_array_check( $users, $creds['username'], $creds['password'] ) )
 				{
 					define('INTERNAL_AUTH_PASSED', TRUE);
@@ -552,7 +552,7 @@ class WP_LockAuth
 	{
 		$login_base = get_option('ld_login_base');
 		
-		//	It's not enabled.
+		// It's not enabled.
 		if ( $login_base == NULL || ! $login_base || $login_base == '' )
 			return;
 		
@@ -564,16 +564,16 @@ class WP_LockAuth
 		add_filter('network_site_url', array( &$this, 'filter_wp_login'));
 		add_filter('site_url', array( &$this, 'filter_wp_login'));
 		
-		//	We need to get the URL
-		//	This means we need to take the current URL,
-		//	strip it of an WordPress path (if the blog is located @ /blog/)
-		//	And then remove the query string
-		//	We also need to remove the index.php from the URL if it exists
+		// We need to get the URL
+		// This means we need to take the current URL,
+		// strip it of an WordPress path (if the blog is located @ /blog/)
+		// And then remove the query string
+		// We also need to remove the index.php from the URL if it exists
 		
-		//	The blog's URL
+		// The blog's URL
 		$blog_url = trailingslashit( get_bloginfo('url') );
 		
-		//	The Current URL
+		// The Current URL
 		$schema = is_ssl() ? 'https://' : 'http://';
 		$current_url = $schema . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		
@@ -591,11 +591,11 @@ class WP_LockAuth
 		$exp = explode( '/', $base, 2 );
 		$super_base = end( $exp );
 
-		//	Are they visiting wp-login.php?
+		// Are they visiting wp-login.php?
 		if ( $super_base == 'wp-login.php')
 			$this->throw_404();
 		
-		//	Is this the "login" url?
+		// Is this the "login" url?
 		if ( $base !== $this->login_base )
 			return FALSE;
 		
