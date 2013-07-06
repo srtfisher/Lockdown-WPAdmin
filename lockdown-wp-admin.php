@@ -640,7 +640,7 @@ class WP_LockAuth
 		wp_dequeue_style( 'admin-bar' );
 
 		// Template
-		$four_tpl = get_404_template();
+		$four_tpl = apply_filters('LD_404', get_404_template());
 
 		// Handle the admin bar
 		@define('APP_REQUEST', TRUE);
