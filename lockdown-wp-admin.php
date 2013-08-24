@@ -54,6 +54,15 @@ class WP_LockAuth
 	protected $login_base = FALSE;
 	
 	/**
+	 * Check if the Auth passed
+	 *
+	 * See {@link WP_LockAuth::getAuthPassed()}
+	 * 
+	 * @var boolean
+	 */
+	protected $passed = FALSE;
+
+	/**
 	 * Constructor
 	 *
 	 * @return void
@@ -203,7 +212,7 @@ class WP_LockAuth
 		
 		// Nonce
 		$nonce = $_POST['_wpnonce'];
-		if (! wp_verify_nonce($nonce, 'lockdown-wp-admin') )
+		if ( ! wp_verify_nonce($nonce, 'lockdown-wp-admin') )
 			wp_die('Security error, please try again.');
 		
 		// ---------------------------------------------------
@@ -214,7 +223,7 @@ class WP_LockAuth
 		else
 			update_option('ld_http_auth', 'none' );
 		
-		if ( !isset( $_POST['hide_wp_admin'] ) )
+		if ( ! isset( $_POST['hide_wp_admin'] ) )
 		{
 			update_option('ld_hide_wp_admin', 'nope');
 		}
@@ -287,16 +296,13 @@ class WP_LockAuth
 	
 	/**
 	 * Setup hiding wp-admin
-	 *
-	 * @access void
 	**/
 	protected function setup_hide_admin()
 	{
 		$opt = get_option('ld_hide_wp_admin');
-		
+
 		// Nope, they didn't enable it.
-		if ( $opt !== 'yep' )
-			return $this->setup_http_area();
+		if ( $opt !== 'yep' ) return;
 		
 		// We're gonna hide it.
 		$no_check_files = array('async-upload.php', 'admin-ajax.php', 'wp-app.php');
@@ -308,18 +314,12 @@ class WP_LockAuth
 		$explode = explode('/', $script_filename);
 		$file = end( $explode );
 	    	
-	    	if ( in_array( $file, $no_check_files ) )
-	    	{
-			define('INTERNAL_AUTH_PASSED', TRUE);
-			return;
-		}
-
-		// Disable for WP-CLI
+	    	// Disable for WP-CLI
 		if ( defined('WP_CLI') AND WP_CLI )
-		{
-			define('INTERNAL_AUTH_PASSED', TRUE);
-			return;
-		}
+			return $this->passed(true);
+
+	    	if ( in_array( $file, $no_check_files ) )
+			return $this->passed(true);
     	
 		// We only will hide it if we are in admin (/wp-admin/)
 		if ( is_admin() )
@@ -353,7 +353,6 @@ class WP_LockAuth
 	
 	/**
 	 * Setting up the HTTP Auth
-	 *
 	 * Here, we only check if it's enabled
 	 *
 	 * @access protected
@@ -387,10 +386,7 @@ class WP_LockAuth
 				
 				// Already logged in?
 				if ( $current_uid === $requested_uid )
-				{
-					define('INTERNAL_AUTH_PASSED', TRUE);
-					return;
-				}
+					return $this->passed(true);
 				
 				// Attempt to sign them in if they aren't already
 				if (! is_user_logged_in() ) :
@@ -407,7 +403,7 @@ class WP_LockAuth
 				endif;
 				
 				// They passed!
-				define('INTERNAL_AUTH_PASSED', TRUE);
+				$this->passed(true);
 			break;
 			
 			// Private list of users to check
@@ -433,7 +429,7 @@ class WP_LockAuth
 				// Did they enter a valid user?
 				if ( $this->user_array_check( $users, $creds['username'], $creds['password'] ) )
 				{
-					define('INTERNAL_AUTH_PASSED', TRUE);
+					$this->passed(true);
 					$this->set_current_user( $users, $creds['username'] );
 					return;
 				}
@@ -555,7 +551,7 @@ class WP_LockAuth
 	public function redo_login_form()
 	{
 		$login_base = get_option('ld_login_base');
-		
+
 		// It's not enabled.
 		if ( $login_base == NULL || ! $login_base || $login_base == '' )
 			return;
@@ -692,6 +688,25 @@ class WP_LockAuth
 	public function getLoginBase()
 	{
 		return $this->login_base;
+	}
+
+	/**
+	 * See if the auth passed
+	 * 
+	 * @return boolean
+	 */
+	public function getAuthPassed() { return $this->passed; }
+
+	/**
+	 * Update the Passed Auth Value
+	 * See {@link WP_LockAuth::getAuthPassed()}
+	 * 
+	 * @access protected
+	 * @param boolean
+	 */
+	protected function passed($value)
+	{
+		$this->passed = (bool) $value;
 	}
 }
 
