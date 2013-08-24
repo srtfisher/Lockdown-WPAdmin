@@ -14,6 +14,7 @@ if (! class_exists('PHPUnit_Framework_TestCase')) :
 		require_once dirname(dirname(__FILE__)).'/vendor/autoload.php';
 endif;
 
+// Still dependant upon loading WP Core
 require(dirname(__FILE__).'/../../../../wp-load.php');
 
 error_reporting(-1);

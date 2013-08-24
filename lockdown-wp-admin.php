@@ -683,13 +683,23 @@ class WP_LockAuth
 			'user-login',
 		)));
 	}
+
+	/**
+	 * Retrieve the Login Base
+	 * 
+	 * @return string
+	 */
+	public function getLoginBase()
+	{
+		return $this->login_base;
+	}
 }
 
 /**
  * The function called at 'init'.
  * Sets up the object
  *
- * @return void
+ * @return object
  * @access private
  * @since 1.0
  * @see do_action() Called by the 'init' action.
@@ -699,6 +709,8 @@ function ld_setup_auth()
 	// Instantiate the object
 	$class = apply_filters('ld_class', 'WP_LockAuth');
 	$auth_obj = new $class();
+
+	return $auth_obj;
 }
 
 add_action('init', 'ld_setup_auth');
