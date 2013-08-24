@@ -4,6 +4,9 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 
 	protected function setUp()
 	{
+		global $wp_filter;
+		$wp_filter = array();
+		
 		$this->object = ld_setup_auth();
 	}
 
@@ -45,7 +48,7 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		remove_all_actions('wp_redirect');
 		remove_all_actions('network_site_url');
 		remove_all_actions('site_url');
-		
+
 		update_option('ld_login_base', 'login');
 		$this->object->redo_login_form();
 
