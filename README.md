@@ -18,6 +18,8 @@ If you enable HTTP authentication, it will add HTTP authentication to the PHP fi
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Navigate to the "Lockdown WP" menu
 
+*Composer is not required to be setup for installation of this plugin! It is simply used for development purposes to provide unit testing.*
+
 ### FAQ
 **How can we add files to the white list to hide from the public eye? We want to have AJAX and use a custom file, but we can't because it hides it from the public.**
 
@@ -92,3 +94,8 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 2.0.2
 * Query string detection bug fix by [James Bonham](http://wordpress.org/support/profile/jamesbonham)
 * Issues with WordPress in a sub-directory
+
+2.1
+* Unit Testing! Unit Testing ensure more reliable code going forward
+* Support for WordPress 3.6
+* General Cleaning

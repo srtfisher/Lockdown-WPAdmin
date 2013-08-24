@@ -4,7 +4,7 @@ Plugin Name: Lockdown WP Admin
 Plugin URI: http://seanfisher.co/lockdown-wp-admin/
 Donate link: http://seanfisher.co/donate/
 Description: Securing the WordPress Administration interface by concealing the administration dashboard and changing the login page URL.
-Version: 2.0.3
+Version: 2.1
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
@@ -17,7 +17,7 @@ define('LD_FILE_NAME', __FILE__ );
  * This is the plugin that will add security to our site
  *
  * @author   Sean Fisher <me@seanfisher.co>
- * @version  2.0.3
+ * @version  2.1
  * @license   GPL 
 **/
 class WP_LockAuth
@@ -28,7 +28,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	public $ld_admin_version = '2.0.3';
+	public $ld_admin_version = '2.1';
 	
 	/**
 	 * The HTTP Auth name for the protected area
