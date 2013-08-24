@@ -8,7 +8,7 @@
 	</div>
 	<?php endif;
 if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
-	<div class="updated fade">
+	<div class="updated error fade">
 		<p>You can't make that your URL Base! </p>
 	</div>
 <?php endif; ?>
@@ -17,7 +17,7 @@ if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
 	<p><a href="https://twitter.com/srtfisher" class="twitter-follow-button" data-show-count="false">Follow @srtfisher</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script><br />
 		I tweet a lot of things and often post whenever I update this plugin. You should follow me <a href="http://twitter.com/srtfisher">@srtfisher</a></p>
-	
+
 	<form method="POST" action="<?php echo admin_url('admin.php?page=lockdown-wp-admin'); ?>">
 		
 		<?php wp_nonce_field('lockdown-wp-admin'); ?>
@@ -33,12 +33,20 @@ if ( defined('LD_DIS_BASE') && LD_DIS_BASE == TRUE ) : ?>
 			<input type="text" name="login_base" value="<?php echo $this->login_base; ?>" />
 			<br />
 			<em>This will change it from <?php echo wp_guess_url(); ?>/wp-login.php to whatever you put in this box. If you leave it <strong>blank</strong>, it will be disabled.<br />
-			Say if you put "login" into the box, your new login URL will be <?php echo home_url(); ?>/login/.</em></label>
+			Say if you put "<strong>login</strong>" into the box, your new login URL will be <?php echo home_url(); ?>/login/.</em></label>
 		<?php
 global $auth_obj;
 $url = home_url() . '/'. $this->login_base;
 ?>
 		<p>Your current login URL is <code><a href="<?php echo $url; ?>"><?php echo $url; ?></a></code>.</p>
+
+		<?php if ($this->isSuggestedAgainst()) : ?>
+			<div class="updated error"><p>
+				Your login base <strong><?php echo $this->login_base; ?></strong> is highly insecure!
+				We strongly reccomend using another login URL to ensure maximum security.
+			</p>
+			</div>
+		<?php endif; ?>
 		<blockquote>
 			<h4>Please Note Something!</h4>
 			<p>If you are using a cache plugin (WTC, WP Super Cache, etc), you need to enable it

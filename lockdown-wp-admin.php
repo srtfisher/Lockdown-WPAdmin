@@ -4,7 +4,7 @@ Plugin Name: Lockdown WP Admin
 Plugin URI: http://seanfisher.co/lockdown-wp-admin/
 Donate link: http://seanfisher.co/donate/
 Description: Securing the WordPress Administration interface by concealing the administration dashboard and changing the login page URL.
-Version: 2.0.2
+Version: 2.0.3
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
@@ -17,7 +17,7 @@ define('LD_FILE_NAME', __FILE__ );
  * This is the plugin that will add security to our site
  *
  * @author   Sean Fisher <me@seanfisher.co>
- * @version  2.0.2
+ * @version  2.0.3
  * @license   GPL 
 **/
 class WP_LockAuth
@@ -28,7 +28,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	public $ld_admin_version = '2.0.2';
+	public $ld_admin_version = '2.0.3';
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -53,6 +53,11 @@ class WP_LockAuth
 	**/
 	protected $login_base = FALSE;
 	
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
 	public function __construct()
 	{
 		// We don't like adding network wide WordPress plugins.
@@ -109,14 +114,14 @@ class WP_LockAuth
 	**/
 	public function update_users()
 	{
-		if (! isset( $_GET['page'] ) )
+		if ( ! isset( $_GET['page'] ) )
 			return;
 		
 		if ( $_GET['page'] !== 'lockdown-private-users' )
 			return;
 		
 		// Nonce
-		if ( !isset( $_REQUEST['_wpnonce'] ) )
+		if ( ! isset( $_REQUEST['_wpnonce'] ) )
 			return;
 		
 		$nonce = $_REQUEST['_wpnonce'];
@@ -223,17 +228,16 @@ class WP_LockAuth
 		
 		if ( isset( $_POST['login_base'] ) )
 		{
-			$exp = explode('/', $_POST['login_base'], 2);
-			$base = reset( $exp );
-			$base = sanitize_title_with_dashes( $base);
+			$base = sanitize_title_with_dashes( $_POST['login_base']);
 			$base = str_replace('/', '', $base);
 			
 			$disallowed = array(
 				'user', 'wp-admin', 'wp-content', 'wp-includes', 'wp-feed.php', 'index', 'feed', 'rss', 'robots', 'robots.txt', 'wp-login.php',
+				'wp-login', 'wp-config', 'blog', 'sitemap', 'sitemap.xml',
 			);
 			if ( in_array( $base, $disallowed ) )
 			{
-				define('LD_DIS_BASE', TRUE);
+				return define('LD_DIS_BASE', TRUE);
 			}
 			else
 			{
@@ -665,11 +669,24 @@ class WP_LockAuth
 		// Either way, it's gonna stop right here.
 		exit;
 	}
+
+	/**
+	 * See if a login base is suggested against
+	 *
+	 * @return boolean
+	 */
+	public function isSuggestedAgainst()
+	{
+		return (in_array($this->login_base, array(
+			'login',
+			'admin',
+			'user-login',
+		)));
+	}
 }
 
 /**
  * The function called at 'init'.
- *
  * Sets up the object
  *
  * @return void
