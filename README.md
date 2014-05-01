@@ -1,6 +1,9 @@
 Lockdown WP Admin
 =============
 
+[![Build Status](https://api.travis-ci.org/srtfisher/Lockdown-WPAdmin.png?branch=master)](https://travis-ci.org/srtfisher/Lockdown-WPAdmin)
+
+
 Lockdown WP Admin conceals the administration and login screen from intruders. It can hide WordPress Admin (/wp-admin/) and and login (/wp-login.php) as well as add HTTP authentication to the login system. We can also change the login URL from wp-login.php to whatever you'd like: /login, /log-in-here, etc.
 
 ### Description
