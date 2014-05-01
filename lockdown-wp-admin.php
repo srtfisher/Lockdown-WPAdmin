@@ -4,7 +4,7 @@ Plugin Name: Lockdown WP Admin
 Plugin URI: http://seanfisher.co/lockdown-wp-admin/
 Donate link: http://seanfisher.co/donate/
 Description: Securing the WordPress Administration interface by concealing the administration dashboard and changing the login page URL.
-Version: 2.1
+Version: 2.2
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
@@ -28,7 +28,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	public $ld_admin_version = '2.1';
+	public $ld_admin_version = '2.2';
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -123,10 +123,7 @@ class WP_LockAuth
 	**/
 	public function update_users()
 	{
-		if ( ! isset( $_GET['page'] ) )
-			return;
-		
-		if ( $_GET['page'] !== 'lockdown-private-users' )
+		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'lockdown-private-users')
 			return;
 		
 		// Nonce
@@ -134,7 +131,7 @@ class WP_LockAuth
 			return;
 		
 		$nonce = $_REQUEST['_wpnonce'];
-		if ( !wp_verify_nonce( $nonce, 'lockdown-wp-admin' ) )
+		if ( ! wp_verify_nonce( $nonce, 'lockdown-wp-admin' ) )
 			wp_die('Security error, please try again.');
 		
 		// Add a user
@@ -148,17 +145,14 @@ class WP_LockAuth
 				$add['pass'] = trim( md5( $_POST['private_password'] ) );
 				
 				// See if it exists
-				if ($this->user_exists($users, $add['user'])) :
-					define('LD_ERROR', 'username-exists');
-					return;
-				endif;
+				if ($this->user_exists($users, $add['user']))
+					return define('LD_ERROR', 'username-exists');
 
 				$users[] = $add;
 				
 				update_option('ld_private_users', $users);
 				
-				define('LD_WP_ADMIN', TRUE);
-				return;
+				return define('LD_WP_ADMIN', TRUE);
 			}
 		}
 		
@@ -178,8 +172,7 @@ class WP_LockAuth
 						if( $this->current_user !== '' && $to_delete === $this->current_user )
 						{
 							// They can't delete themselves!
-							define('LD_ERROR', 'delete-self');
-							return;
+							return define('LD_ERROR', 'delete-self');
 						}
 						
 						unset( $users[$key] );
@@ -257,8 +250,7 @@ class WP_LockAuth
 		}
 		
 		// Redirect
-		define('LD_WP_ADMIN', TRUE);
-		return;
+		return define('LD_WP_ADMIN', TRUE);
 	}
 	
 	/**
@@ -274,7 +266,7 @@ class WP_LockAuth
 		if ( file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'disable_auth.txt'))
 			return;
 		
-		header('WWW-Authenticate: Basic realm="'.$this->relm.'"');
+		header('WWW-Authenticate: Basic realm="'. $this->relm.'"');
 		header('HTTP/1.0 401 Unauthorized');
 		echo '<h1>Authorization Required.</h1>';
 		exit;
