@@ -17,6 +17,11 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Lockdown_Admin', $this->object->admin);
 	}
 
+	public function testRelm()
+	{
+		$this->assertTrue(is_string($this->object->relm));
+	}
+	
 	/**
 	 * Test that the application has added an action to init
 	 */

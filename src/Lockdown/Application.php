@@ -199,13 +199,14 @@ class Lockdown_Application {
 	 *
 	 * @access protected
 	**/
-	protected function setupHttpCheck()
+	protected function setupHttpCheck($option = NULL)
 	{
 		// We save what type of auth we're doing here.
-		$opt = get_option('ld_http_auth');
+		if (! $option)
+			$option = get_option('ld_http_auth');
 		
 		// What type of auth are we doing?
-		switch( $opt )
+		switch( $option )
 		{
 			// HTTP auth is going to ask for their WordPress creds.
 			case 'wp_creds' :
@@ -284,6 +285,7 @@ class Lockdown_Application {
 			
 			// Unknown type of auth
 			default :
+				$this->instance->passed(true);
 				return FALSE;
 		}
 	}
@@ -295,7 +297,7 @@ class Lockdown_Application {
 	 * @access private
 	 * @return void
 	**/
-	private function unauthorizedArea()
+	protected function unauthorizedArea()
 	{
 		// Disable if there is a text file there.
 		if ( file_exists(LD_PLUGIN_DIR.'/disable_auth.txt'))
@@ -355,6 +357,9 @@ class Lockdown_Application {
 	{
 		foreach( $array as $key => $val )
 		{
+			if (! isset($val['user']) || ! isset($val['pass']))
+				continue;
+
 			if ( $val['user'] === $user && md5( $pass ) === $val['pass'] )
 				return TRUE;
 		}
