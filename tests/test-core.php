@@ -7,6 +7,16 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		$this->object = ld_setup_auth();
 	}
 
+	public function testApplicationSetup()
+	{
+		$this->assertInstanceOf('Lockdown_Application', $this->object->application);
+	}
+
+	public function testAdminSetup()
+	{
+		$this->assertInstanceOf('Lockdown_Admin', $this->object->admin);
+	}
+
 	/**
 	 * Test that the application has added an action to init
 	 */
@@ -33,7 +43,7 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		remove_all_actions('site_url');
 
 		update_option('ld_login_base', null);
-		$this->object->redo_login_form();
+		$this->object->application->renameLogin();
 
 		$this->assertFalse(has_action('wp_redirect'));
 		$this->assertFalse(has_action('network_site_url'));
@@ -47,7 +57,7 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		remove_all_actions('site_url');
 
 		update_option('ld_login_base', 'login');
-		$this->object->redo_login_form();
+		$this->object->application->renameLogin();
 
 		$this->assertTrue(has_action('wp_redirect'));
 		$this->assertTrue(has_action('network_site_url'));
@@ -57,14 +67,14 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	public function testLoginBase()
 	{
 		update_option('ld_login_base', 'login');
-		$this->object->redo_login_form();
+		$this->object->application->renameLogin();
 
 		$this->assertEquals('login', $this->object->getLoginBase());
 	}
 
 	public function testRewriteUrl()
 	{
-		$this->assertEquals('http://localhost/login', $this->object->filter_wp_login('http://localhost/wp-login.php'));
+		$this->assertEquals('http://localhost/login', $this->object->application->filterWpLogin('http://localhost/wp-login.php'));
 	}
 }
 

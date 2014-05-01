@@ -29,7 +29,7 @@ class WP_LockAuth
 	 * @global string
 	 * @access private
 	**/
-	public $ld_admin_version = '2.2';
+	public static $ld_admin_version = '2.2';
 	
 	/**
 	 * The HTTP Auth name for the protected area
@@ -114,7 +114,7 @@ class WP_LockAuth
 	 */
 	public function getLoginBase()
 	{
-		return $this->application->login_base;
+		return $this->application->getLoginBase();
 	}
 
 	/**
