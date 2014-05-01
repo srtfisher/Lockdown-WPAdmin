@@ -39,7 +39,7 @@ class Lockdown_Admin {
 	public function admin_callback()
 	{
 		// Update the options
-		$this->update_options();
+		$this->updateSettings();
 		
 		// The UI
 		require_once( LD_PLUGIN_DIR . '/views/settings.php' );
@@ -56,7 +56,7 @@ class Lockdown_Admin {
 		$this->update_users();
 		
 		// The UI
-		$private_users = $this->instance->get_private_users();
+		$private_users = $this->instance->application->getPrivateUsers();
 		require_once( LD_PLUGIN_DIR . '/admin-private-users.php' );
 	}
 
@@ -65,15 +65,9 @@ class Lockdown_Admin {
 	 *
 	 * @access private
 	**/
-	public function update_options()
+	public function updateSettings()
 	{
-		if ( !isset( $_GET['page'] ) )
-			return;
-		
-		if ( $_GET['page'] !== 'lockdown-wp-admin' )
-			return;
-		
-		if ( !isset( $_POST['did_update'] ) )
+		if ( !isset( $_GET['page'] ) || $_GET['page'] !== 'lockdown-wp-admin' || !isset( $_POST['did_update'] ))
 			return;
 		
 		// Nonce

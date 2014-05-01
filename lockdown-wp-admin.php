@@ -110,12 +110,11 @@ class WP_LockAuth
 
 	/**
 	 * Retrieve the Login Base
-	 * 
 	 * @return string
 	 */
 	public function getLoginBase()
 	{
-		return $this->login_base;
+		return $this->application->login_base;
 	}
 
 	/**

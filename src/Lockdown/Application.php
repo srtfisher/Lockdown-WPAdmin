@@ -62,10 +62,10 @@ class Lockdown_Application {
 		{
 			// Non logged in users.
 			if ( ! is_user_logged_in() )
-				$this->throw_404();
+				$this->throw404();
 						
 			// Setup HTTP auth.
-			$this->setup_http_area();
+			$this->setupHttpCheck();
 		}
 	}
 
@@ -75,7 +75,7 @@ class Lockdown_Application {
 	 * @param   void
 	 * @return  void
 	**/
-	public function throw_404()
+	public function throw404()
 	{
 		// Change WP Query
 		global $wp_query;
@@ -122,6 +122,8 @@ class Lockdown_Application {
 	/**
 	 * Rename the login URL
 	 *
+	 *
+	 * @see do_action() Calls `ld_login_page` right before we call `wp-login.php`
 	 * @access public
 	**/
 	public function renameLogin()
@@ -133,9 +135,9 @@ class Lockdown_Application {
 			return;
 		
 		// Setup the filters for the new login form
-		add_filter('wp_redirect', array( &$this, 'filter_wp_login'));
-		add_filter('network_site_url', array( &$this, 'filter_wp_login'));
-		add_filter('site_url', array( &$this, 'filter_wp_login'));
+		add_filter('wp_redirect', array( &$this, 'filterWpLogin'));
+		add_filter('network_site_url', array( &$this, 'filterWpLogin'));
+		add_filter('site_url', array( &$this, 'filterWpLogin'));
 		
 		// We need to get the URL
 		// This means we need to take the current URL,
@@ -163,12 +165,12 @@ class Lockdown_Application {
 
 		// Are they visiting wp-login.php?
 		if ( $super_base == 'wp-login.php')
-			$this->throw_404();
+			$this->throw404();
 		
 		// Is this the "login" url?
-		if ( $base !== $this->instance->getLoginBase() )
+		if ( $base !== $this->getLoginBase() )
 			return FALSE;
-		
+
 		// We dont' want a WP plugin caching this page
 		@define('NO_CACHE', TRUE);
 		@define('WTC_IN_MINIFY', TRUE);
@@ -186,9 +188,9 @@ class Lockdown_Application {
 	 *
 	 * @access public
 	**/
-	public function filter_wp_login( $str )
+	public function filterWpLogin( $str )
 	{
-		return str_replace('wp-login.php', $this->instance->getLoginBase(), $str);
+		return str_replace('wp-login.php', $this->getLoginBase(), $str);
 	}
 
 	/**
@@ -197,7 +199,7 @@ class Lockdown_Application {
 	 *
 	 * @access protected
 	**/
-	protected function setup_http_area()
+	protected function setupHttpCheck()
 	{
 		// We save what type of auth we're doing here.
 		$opt = get_option('ld_http_auth');
