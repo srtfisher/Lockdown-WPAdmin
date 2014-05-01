@@ -1,4 +1,4 @@
-<?php if (! defined('ABSPATH')) exit;
+<?php
 /**
  * We don't want to allow for this plugin to be used in WP-MS or network wide.
  *
@@ -84,6 +84,6 @@ class Disable_WPMS_Plugin_LD
 }
 
 // The object.
-$setup_no_wpmu = new Disable_WPMS_Plugin_LD;
+new Disable_WPMS_Plugin_LD;
 
 /* End of file: no-wpmu.php */

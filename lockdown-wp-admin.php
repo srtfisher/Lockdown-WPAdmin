@@ -641,7 +641,7 @@ class WP_LockAuth
 		if ( empty($four_tpl) OR ! file_exists($four_tpl) )
 		{
 			// We're gonna try and get TwentyTen's one
-			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentythirteen/404.php');
+			$twenty_ten_tpl = apply_filters('LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentyfourteen/404.php');
 			
 			if (file_exists($twenty_ten_tpl))
 				require($twenty_ten_tpl);

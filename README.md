@@ -99,3 +99,7 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 * Unit Testing! Unit Testing ensure more reliable code going forward
 * Support for WordPress 3.6
 * General Cleaning
+
+2.2
+* Fixing issues with other plugins
+* Support tested for 3.9
