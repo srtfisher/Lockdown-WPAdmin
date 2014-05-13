@@ -19,11 +19,15 @@
 	<p>
 		<a href="https://twitter.com/srtfisher" class="twitter-follow-button" data-show-count="false">Follow @srtfisher</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script><br />
-		I tweet a lot of things and often post whenever I update this plugin. You should follow me <a href="http://twitter.com/srtfisher">@srtfisher</a>.
+		I tweet a lot of things and often post whenever I update this plugin. Follow me <a href="http://twitter.com/srtfisher">@srtfisher</a>.
 		<br>
 		<em>
 			(Also, I am a freelancer and would love to <a href="http://seanfisher.co/contact">hear from you about your project</a>!)
 		</em>
+	</p>
+
+	<p>
+		Follow Lockdown WP-Admin development on <a href="https://github.com/srtfisher/Lockdown-WPAdmin" target="_blank">GitHub</a>
 	</p>
 
 	<form method="POST" action="<?php echo admin_url('admin.php?page=lockdown-wp-admin'); ?>">
