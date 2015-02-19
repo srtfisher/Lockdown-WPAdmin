@@ -21,7 +21,7 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertTrue(is_string($this->object->relm));
 	}
-	
+
 	/**
 	 * Test that the application has added an action to init
 	 */
@@ -37,8 +37,9 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	{
 		add_filter('ld_class', function() { return 'LdProxyObject'; });
 		$setup = ld_setup_auth();
+
 		$this->assertEquals('LdProxyObject', get_class($setup));
-		$this->assertEquals('WP_LockAuth', get_class($this->object));
+		$this->assertEquals('Lockdown_Manager', get_class($this->object));
 	}
 
 	public function testFiltersWithoutBase()
@@ -86,4 +87,12 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 /**
  * @ignore
  */
-class LdProxyObject extends WP_LockAuth { }
+class LdProxyObject extends Lockdown_Manager {
+	/**
+	 * Get around the singleton nature of the application
+	 */
+	public static function instance()
+	{
+		return new LdProxyObject;
+	}
+}
