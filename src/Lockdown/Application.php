@@ -146,13 +146,12 @@ class Lockdown_Application {
 		$this->login_base = get_option('ld_login_base');
 
 		// It's not enabled.
-		if ( $this->login_base == NULL || ! $this->login_base || $this->login_base == '' )
-			return;
+		if (empty($this->login_base) || ! $this->login_base) return;
 
 		// Setup the filters for the new login form
-		add_filter('wp_redirect', array( &$this, 'filterWpLogin'));
-		add_filter('network_site_url', array( &$this, 'filterWpLogin'));
-		add_filter('site_url', array( &$this, 'filterWpLogin'));
+		add_filter('wp_redirect', array( &$this, 'filterLoginUrl'));
+		add_filter('network_site_url', array( &$this, 'filterLoginUrl'));
+		add_filter('site_url', array( &$this, 'filterLoginUrl'));
 
 		// We need to get the URL
 		// This means we need to take the current URL,
@@ -203,7 +202,7 @@ class Lockdown_Application {
 	 *
 	 * @access public
 	**/
-	public function filterWpLogin( $str )
+	public function filterLoginUrl($str = '')
 	{
 		return str_replace('wp-login.php', $this->getLoginBase(), $str);
 	}

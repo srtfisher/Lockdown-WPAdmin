@@ -78,9 +78,20 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('login', $this->object->getLoginBase());
 	}
 
+	public function testLogoutUrl()
+	{
+		// Update the login base
+		update_option('ld_login_base', 'login');
+
+		$this->object->application->renameLogin();
+		$logout_url = wp_logout_url();
+
+		$this->assertTrue(strpos($logout_url, 'login') >= 0);
+	}
+
 	public function testRewriteUrl()
 	{
-		$this->assertEquals('http://localhost/login', $this->object->application->filterWpLogin('http://localhost/wp-login.php'));
+		$this->assertEquals('http://localhost/login', $this->object->application->filterLoginUrl('http://localhost/wp-login.php'));
 	}
 }
 
