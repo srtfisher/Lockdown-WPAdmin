@@ -216,12 +216,10 @@ class Lockdown_Application {
 	protected function setupHttpCheck($option = NULL)
 	{
 		// We save what type of auth we're doing here.
-		if (! $option)
-			$option = get_option('ld_http_auth');
+		if (! $option) $option = get_option('ld_http_auth');
 
 		// What type of auth are we doing?
-		switch( $option )
-		{
+		switch( $option ) {
 			// HTTP auth is going to ask for their WordPress creds.
 			case 'wp_creds' :
 				$creds = $this->retrieveAuthCredentials();

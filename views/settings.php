@@ -13,9 +13,7 @@
 		</div>
 	<?php endif; ?>
 
-	<p>
-		We are going to help make WordPress a bit more secure.
-	</p>
+	<p>We are going to help make WordPress a bit more secure.</p>
 	<p>
 		<a href="https://twitter.com/srtfisher" class="twitter-follow-button" data-show-count="false">Follow @srtfisher</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script><br />
@@ -31,11 +29,9 @@
 	</p>
 
 	<form method="POST" action="<?php echo admin_url('admin.php?page=lockdown-wp-admin'); ?>">
-		
+
 		<?php wp_nonce_field('lockdown-wp-admin'); ?>
-		<h3>
-			Hide WP Admin
-		</h3>
+		<h3>Hide WP Admin</h3>
 		<p>
 			We can "hide" WordPress's administration interface from the public.
 			If you enable this, when you access
@@ -51,10 +47,8 @@
 				} ?>>
 			Yes, please hide WP Admin from the user when they aren't logged in.
 		</label>
-		
-		<h3 style="margin-top: 30px;">
-			WordPress Login URL
-		</h3>
+
+		<h3 style="margin-top: 30px;">WordPress Login URL</h3>
 		<label>
 			Change the WordPress Login URL?
 			<?php echo wp_guess_url().'/'; ?>

@@ -62,7 +62,7 @@ class Lockdown_Admin {
 
 		// The UI
 		$private_users = $this->instance->application->getPrivateUsers();
-		require_once( LD_PLUGIN_DIR . '/admin-private-users.php' );
+		require_once(LD_PLUGIN_DIR . '/views/private-users.php');
 	}
 
 	/**
