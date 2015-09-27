@@ -10,5 +10,4 @@ function _manually_load_plugin() {
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
-require dirname( __FILE__ ) . '/../vendor/autoload.php';
 require $_tests_dir . '/includes/bootstrap.php';

@@ -1,16 +1,10 @@
 <?php
-use \Mockery as m;
 class LockdownAdminTest extends PHPUnit_Framework_TestCase {
 	protected $object;
 
 	protected function setUp()
 	{
 		$this->object = ld_setup_auth();
-	}
-
-	protected function tearDown()
-	{
-		m::close();
 	}
 
 	public function testWhitelist()
