@@ -181,7 +181,7 @@ class Lockdown_Admin {
 			if ( count( $users ) > 0 ) {
 				foreach ( $users as $key => $val ) {
 					if ( $key === $to_delete ) {
-						if ( ! empty( $this->current_user ) && $to_delete === $this->current_user ) {
+						if ( $to_delete === $this->instance->application->current_user ) {
 							// They can't delete themself.
 							return $this->add_message( __( 'You cannot delete yourself.', 'lockdown-wp-admin' ) );
 						} else {

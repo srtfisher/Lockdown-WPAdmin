@@ -322,7 +322,8 @@ class Lockdown_Application {
 	public function setUser( $array, $user ) {
 		foreach ( $array as $key => $val ) {
 			if ( $val['user'] === $user ) {
-				$this->current_user = $key; }
+				$this->current_user = $key;
+			}
 		}
 	}
 
