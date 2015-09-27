@@ -24,7 +24,7 @@ class Lockdown_Application {
 	 *
 	 * @param Lockdown_Manager
 	 */
-	public function __construct( $instance ) {
+	public function __construct( Lockdown_Manager $instance ) {
 		$this->instance = $instance;
 
 		// Setup the plugin.
@@ -84,7 +84,7 @@ class Lockdown_Application {
 	 *
 	 * @param   void
 	 * @return  void
-	 **/
+	 */
 	public function throw404() {
 		// Change WP Query
 		global $wp_query;
@@ -137,7 +137,7 @@ class Lockdown_Application {
 	 *
 	 * @see do_action() Calls `ld_login_page` right before we call `wp-login.php`
 	 * @access public
-	 **/
+	 */
 	public function renameLogin() {
 		$this->login_base = get_option( 'ld_login_base' );
 
@@ -196,7 +196,7 @@ class Lockdown_Application {
 	 * Filters out wp-login to whatever they named it
 	 *
 	 * @access public
-	 **/
+	 */
 	public function filterLoginUrl( $str = '' ) {
 		return str_replace( 'wp-login.php', $this->getLoginBase(), $str );
 	}
@@ -206,10 +206,12 @@ class Lockdown_Application {
 	 * Here, we only check if it's enabled
 	 *
 	 * @access protected
-	 **/
+	 */
 	protected function setupHttpCheck( $option = null ) {
 		// We save what type of auth we're doing here.
-		if ( ! $option ) { $option = get_option( 'ld_http_auth' ); }
+		if ( ! $option ) {
+			$option = $this->getHttpAuth();
+		}
 
 		// What type of auth are we doing?
 		switch ( $option ) {
@@ -298,7 +300,7 @@ class Lockdown_Application {
 	 *
 	 * @access private
 	 * @return void
-	 **/
+	 */
 	protected function unauthorizedArea() {
 		// Disable if there is a text file there.
 		if ( file_exists( LD_PLUGIN_DIR.'/disable_auth.txt' ) ) {
@@ -316,7 +318,7 @@ class Lockdown_Application {
 	 * @access private
 	 * @param array
 	 * @param integer
-	 **/
+	 */
 	public function setUser( $array, $user ) {
 		foreach ( $array as $key => $val ) {
 			if ( $val['user'] === $user ) {
@@ -328,7 +330,7 @@ class Lockdown_Application {
 	 * Get the current file name
 	 *
 	 * @return string JUST the file name
-	 **/
+	 */
 	public function retrieveFile() {
 		// We're gonna hide it.
 		$no_check_files = array( 'async-upload.php' );
@@ -350,7 +352,7 @@ class Lockdown_Application {
 	 * @param array  $array The array of users
 	 * @param string $user The username to check for
 	 * @param string $pass The password to check for (plain text)
-	 **/
+	 */
 	protected function matchUserToArray( $array, $user, $pass ) {
 		foreach ( $array as $key => $val ) {
 			if ( ! isset( $val['user'] ) || ! isset( $val['pass'] ) ) {
@@ -359,25 +361,6 @@ class Lockdown_Application {
 			if ( $val['user'] === $user && md5( $pass ) === $val['pass'] ) {
 				return true; }
 		}
-
-		return false;
-	}
-
-	/**
-	 * See if a user exists in the array
-	 *
-	 * @access public
-	 * @return boolean
-	 * @param array Array of users
-	 * @param string
-	 */
-	public function userExists( $array, $user ) {
-		if ( count( $array ) == 0 ) { return false; }
-
-		foreach ( $array as $k => $v ) :
-			if ( $v['user'] == $user ) {
-				return true; }
-		endforeach;
 
 		return false;
 	}
@@ -406,28 +389,56 @@ class Lockdown_Application {
 	}
 
 	/**
-	 * Set the login base
+	 * Update and save the login base
 	 *
 	 * @param  string
 	 */
 	public function setLoginBase( $base = '' ) {
+		update_option( 'ld_login_base', $base );
 		$this->login_base = $base;
 		return $this;
+	}
+
+	/**
+	 * Retrieve the HTTP Auth setting
+	 *
+	 * @return string
+	 */
+	public function getHttpAuth() {
+		return get_option( 'ld_http_auth' );
+	}
+
+	/**
+	 * Set the HTTP Auth usage
+	 *
+	 * @param string
+	 */
+	public function setHttpAuth( $type = 'none' ) {
+		update_option( 'ld_http_auth', $type );
+	}
+
+	/**
+	 * Set the option to hide WP Admin
+	 *
+	 * @param bool True for enabled, otherwise false
+	 */
+	public function setHideWpAdmin( $status ) {
+		update_option( 'ld_hide_wp_admin', (bool) $status );
 	}
 
 	/**
 	 * Get a username and password from the Basic HTTP auth
 	 *
 	 * @return array|bool
-	 **/
+	 */
 	public function retrieveAuthCredentials() {
 		// Since PHP saves the HTTP Password in a bunch of places, we have to be able to test for all of them
 		$username = $password = null;
 
 		// mod_php
 		if ( isset( $_SERVER['PHP_AUTH_USER'] ) ) {
-		    $username = (isset( $_SERVER['PHP_AUTH_USER'] )) ? $_SERVER['PHP_AUTH_USER'] : null;
-		    $password = (isset( $_SERVER['PHP_AUTH_PW'] )) ? $_SERVER['PHP_AUTH_PW'] : null;
+			$username = (isset( $_SERVER['PHP_AUTH_USER'] )) ? $_SERVER['PHP_AUTH_USER'] : null;
+			$password = (isset( $_SERVER['PHP_AUTH_PW'] )) ? $_SERVER['PHP_AUTH_PW'] : null;
 		} // most other servers
 		elseif ( $_SERVER['HTTP_AUTHENTICATION'] ) {
 			if ( strpos( strtolower( $_SERVER['HTTP_AUTHENTICATION'] ),'basic' ) === 0 ) {
@@ -436,21 +447,78 @@ class Lockdown_Application {
 		}
 
 		// Check them - if they're null a/o empty, they're invalid.
-		if ( is_null( $username ) or is_null( $password ) or empty( $username ) or empty( $password ) ) {
+		if ( is_null( $username ) OR is_null( $password ) OR empty( $username ) OR empty( $password ) ) {
 			return false;
-		} else { 			return array( 'username' => $username, 'password' => $password ); }
+		} else {
+			return compact( 'username', 'password' );
+		}
 	}
 
 	/**
 	 * Get the users for the private creds
 	 *
 	 * @access private
-	 **/
+	 */
 	public function getPrivateUsers() {
-		$opt = get_option( 'ld_private_users' );
-		if ( ! is_array( $opt ) ) {
-			return array(); }
+		return (array) get_option( 'ld_private_users' );
+	}
 
-		return $opt;
+	/**
+	 * Set the private users
+	 *
+	 * @param array $users
+	 */
+	public function setPrivateUsers( array $users ) {
+		return update_option( 'ld_private_users', $users );
+	}
+
+	/**
+	 * Add Private User
+	 *
+	 * @param string $username
+	 * @param string $password
+	 * @throws Exception
+	 */
+	public function addPrivateUser( $username, $password ) {
+		$users = $this->getPrivateUsers();
+
+		if ( $this->doesUsernameExist( $username ) ) {
+			throw new Exception( __( 'Username already exists.', 'lockdown-wp-admin' ) );
+		} else {
+			$users[] = array(
+				'user' => sanitize_user( $username ),
+				'pass' => trim( md5( $password ) ),
+			);
+		}
+
+		$this->setPrivateUsers( $users );
+	}
+
+	/**
+	 * See if a user exists in the array
+	 *
+	 * @access public
+	 * @return boolean
+	 * @param  string $username
+	 */
+	public function doesUsernameExist( $username ) {
+		$users = $this->getPrivateUsers();
+
+		if ( empty( $users ) ) {
+			return false;
+		} else {
+			return in_array( $username, wp_list_pluck( $users, 'user' ) );
+		}
+	}
+
+	/**
+	 * Determine if we're hiding wp-admin
+	 * The use of 'yep' is deprecated.
+	 *
+	 * @return bool
+	 */
+	public function is_hiding_admin() {
+		$opt = get_option('ld_hide_wp_admin');
+		return ( 'yep' === $opt || '1' == $opt );
 	}
 }

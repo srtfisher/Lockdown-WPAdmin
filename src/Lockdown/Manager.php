@@ -29,7 +29,7 @@ class Lockdown_Manager
 	 * The current user ID from our internal array
 	 *
 	 * @access	private
-	 **/
+	 */
 	protected $current_user = false;
 
 	/**
@@ -62,11 +62,12 @@ class Lockdown_Manager
 	protected static $instance;
 
 	/**
-	 * Constructor
+	 * Protected Constructor
 	 *
+	 * @see {Lockdown_Manager::instance()}
 	 * @return void
 	 */
-	public function __construct() {
+	protected function __construct() {
 
 		// We don't like adding network wide WordPress plugins.
 		if ( ! class_exists( 'Disable_WPMS_Plugin_LD' ) ) {
@@ -74,8 +75,8 @@ class Lockdown_Manager
 		}
 
 		// Include dependant classes
-		require_once( LD_PLUGIN_DIR.'/src/Lockdown/Application.php' );
-		require_once( LD_PLUGIN_DIR.'/src/Lockdown/Admin.php' );
+		require_once( LD_PLUGIN_DIR . '/src/Lockdown/Application.php' );
+		require_once( LD_PLUGIN_DIR . '/src/Lockdown/Admin.php' );
 
 		// Instantiate objects
 		$this->admin = new Lockdown_Admin( $this );
@@ -83,17 +84,16 @@ class Lockdown_Manager
 	}
 
 	/**
-	 * Retrieve the singleton instance of the manager
+	 * Get Instance of Lockdown_Manager
 	 *
 	 * @return Lockdown_Manager
 	 */
 	public static function instance() {
-
-		if ( ! static::$instance ) {
-			static::$instance = new static;
+		if ( empty( self::$instance ) ) {
+			self::$instance = new self;
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**

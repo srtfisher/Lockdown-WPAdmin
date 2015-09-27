@@ -30,7 +30,6 @@ define( 'LD_PLUGIN_DIR', dirname( __FILE__ ) );
  * @throws Exception
  */
 function ld_setup_auth() {
-
 	// Include Manager
 	require_once( LD_PLUGIN_DIR . '/src/Lockdown/Manager.php' );
 

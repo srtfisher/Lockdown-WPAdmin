@@ -3,14 +3,14 @@
  * We don't want to allow for this plugin to be used in WP-MS or network wide.
  *
  * @author Sean Fisher
-**/
+*/
 class Disable_WPMS_Plugin_LD
 {
 	/**
 	 * Object Constructor
 	 *
 	 * @return void
-	**/
+	*/
 	function __construct()
 	{
 		register_activation_hook(LD_FILE_NAME, array( &$this, 'on_activate') );
@@ -20,7 +20,7 @@ class Disable_WPMS_Plugin_LD
 	 * Called when activating the plugin
 	 *
 	 * @access private
-	**/
+	*/
 	function on_activate()
 	{
 		// Disable buggy sitewide activation in WPMU and WP 3.0
@@ -36,7 +36,7 @@ class Disable_WPMS_Plugin_LD
 	 * De-activate a plugin
 	 *
 	 * @access private
-	**/
+	*/
 	public function network_activate_error()
 	{
 		// De-activate the plugin
