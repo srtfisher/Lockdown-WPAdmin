@@ -8,6 +8,7 @@ Version: 2.3
 Author: Sean Fisher
 Author URI: http://seanfisher.co/
 License: GPL
+Text Domain: lockdown-wp-admin
 */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }

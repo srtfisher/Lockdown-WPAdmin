@@ -107,3 +107,8 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 * Fixing issues with other plugins
 * Support tested for 3.9
 * Large code structure changes. If you are extending the `Lockdown_Manager` at all, you should basically check the class anew since it was seperated into Admin and Application services.
+
+2.3
+* Fixing issues with latests WordPress Version
+* Cleaning of code, enhancements.
+* Localizing all the strings.
