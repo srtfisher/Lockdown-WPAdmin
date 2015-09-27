@@ -95,7 +95,7 @@ class Lockdown_Admin {
 	 * @access private
 	 */
 	public function settings_page_update() {
-		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'lockdown-wp-admin' || empty( $_POST['did_update'] ) ) {
+		if ( ! isset( $_GET['page'] ) || 'lockdown-wp-admin' !== $_GET['page'] || empty( $_POST['did_update'] ) ) {
 			return;
 		}
 
@@ -178,7 +178,7 @@ class Lockdown_Admin {
 			$users = $this->instance->application->getPrivateUsers();
 			$to_delete = (int) $_GET['delete'];
 
-			if ( count( $users ) > 0 ) {
+			if ( ! empty( $users ) ) {
 				foreach ( $users as $key => $val ) {
 					if ( $key === $to_delete ) {
 						if ( $to_delete === $this->instance->application->current_user ) {

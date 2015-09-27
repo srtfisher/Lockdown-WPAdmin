@@ -1,7 +1,6 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <?php $manager = Lockdown_Manager::instance(); ?>
 <div class="wrap">
-	<div id="icon-options-general" class="icon32"></div>
 	<h2><?php esc_html_e( 'Lockdown WordPress Admin', 'lockdown-wp-admin' ); ?></h2>
 	<?php include LD_PLUGIN_DIR . '/views/errors.php'; ?>
 

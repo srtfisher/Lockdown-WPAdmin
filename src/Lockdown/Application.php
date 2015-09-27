@@ -171,7 +171,7 @@ class Lockdown_Application {
 		$super_base = end( $exp );
 
 		// Are they visiting wp-login.php?
-		if ( $super_base == 'wp-login.php' ) {
+		if ( 'wp-login.php' === $super_base ) {
 			$this->throw404();
 		}
 
@@ -303,10 +303,11 @@ class Lockdown_Application {
 	 */
 	protected function unauthorizedArea() {
 		// Disable if there is a text file there.
-		if ( file_exists( LD_PLUGIN_DIR.'/disable_auth.txt' ) ) {
-			return; }
+		if ( file_exists( LD_PLUGIN_DIR . '/disable_auth.txt' ) ) {
+			return;
+		}
 
-		header( 'WWW-Authenticate: Basic realm="'. $this->instance->relm.'"' );
+		header( 'WWW-Authenticate: Basic realm="'. esc_attr( $this->instance->relm ) . '"' );
 		header( 'HTTP/1.0 401 Unauthorized' );
 		echo '<h1>Authorization Required.</h1>';
 		exit;
@@ -357,10 +358,12 @@ class Lockdown_Application {
 	protected function matchUserToArray( $array, $user, $pass ) {
 		foreach ( $array as $key => $val ) {
 			if ( ! isset( $val['user'] ) || ! isset( $val['pass'] ) ) {
-				continue; }
+				continue;
+			}
 
 			if ( $val['user'] === $user && md5( $pass ) === $val['pass'] ) {
-				return true; }
+				return true;
+			}
 		}
 
 		return false;
@@ -383,10 +386,10 @@ class Lockdown_Application {
 	 * Retrieve the login base
 	 *
 	 * @return string
-	 * @param string Default
+	 * @param  string Default
 	 */
 	public function getLoginBase( $default = '' ) {
-		return ($this->login_base) ? $this->login_base : $default;
+		return ( $this->login_base ) ? $this->login_base : $default;
 	}
 
 	/**
@@ -438,12 +441,12 @@ class Lockdown_Application {
 
 		// mod_php
 		if ( isset( $_SERVER['PHP_AUTH_USER'] ) ) {
-			$username = (isset( $_SERVER['PHP_AUTH_USER'] )) ? $_SERVER['PHP_AUTH_USER'] : null;
-			$password = (isset( $_SERVER['PHP_AUTH_PW'] )) ? $_SERVER['PHP_AUTH_PW'] : null;
+			$username = ( isset( $_SERVER['PHP_AUTH_USER'] ) ) ? $_SERVER['PHP_AUTH_USER'] : null;
+			$password = ( isset( $_SERVER['PHP_AUTH_PW'] ) ) ? $_SERVER['PHP_AUTH_PW'] : null;
 		} // most other servers
 		elseif ( $_SERVER['HTTP_AUTHENTICATION'] ) {
-			if ( strpos( strtolower( $_SERVER['HTTP_AUTHENTICATION'] ),'basic' ) === 0 ) {
-				list($username,$password) = explode( ':',base64_decode( substr( $_SERVER['HTTP_AUTHENTICATION'], 6 ) ) );
+			if ( 0 === strpos( strtolower( $_SERVER['HTTP_AUTHENTICATION'] ), 'basic' ) ) {
+				list( $username, $password ) = explode( ':', base64_decode( substr( $_SERVER['HTTP_AUTHENTICATION'], 6 ) ) );
 			}
 		}
 
@@ -476,12 +479,17 @@ class Lockdown_Application {
 	/**
 	 * Add Private User
 	 *
-	 * @param string $username
-	 * @param string $password
+	 * @param  string $username
+	 * @param  string $password
 	 * @throws Exception
 	 */
 	public function addPrivateUser( $username, $password ) {
 		$users = $this->getPrivateUsers();
+
+		// Ensure the data is valid
+		if ( empty( $username ) || empty( $password ) ) {
+			throw new Exception( __( 'Username/password is empty.', 'lockdown-wp-admin' ) );
+		}
 
 		if ( $this->doesUsernameExist( $username ) ) {
 			throw new Exception( __( 'Username already exists.', 'lockdown-wp-admin' ) );
