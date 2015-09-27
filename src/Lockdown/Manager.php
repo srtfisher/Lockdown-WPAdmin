@@ -1,129 +1,128 @@
 <?php
 /**
-* Lockdown WP Admin Manager Class
-*
-* @author   Sean Fisher <me@seanfisher.co>
-* @version  2.3
-* @license  GPL
-* @package  lockdown
-*/
+ * Lockdown WP Admin Manager Class
+ *
+ * @author   Sean Fisher <me@seanfisher.co>
+ * @version  2.3
+ * @license  GPL
+ * @package  lockdown
+ */
 class Lockdown_Manager
 {
-  /**
-  * The version of lockdown WP Admin
-  *
-  * @global string
-  */
-  public static $ld_admin_version = '2.3';
+	/**
+	 * The version of lockdown WP Admin
+	 *
+	 * @global string
+	 */
+	public static $ld_admin_version = '2.3';
 
-  /**
-  * The HTTP Auth name for the protected area
-  * Change this via calling the object, not by editing the file.
-  *
-  * @access	public
-  * @type	string
-  */
-  public $relm = 'Secure Area';
+	/**
+	 * The HTTP Auth name for the protected area
+	 * Change this via calling the object, not by editing the file.
+	 *
+	 * @access	public
+	 * @type	string
+	 */
+	public $relm = 'Secure Area';
 
-  /**
-  * The current user ID from our internal array
-  *
-  * @access	private
-  **/
-  protected $current_user = FALSE;
+	/**
+	 * The current user ID from our internal array
+	 *
+	 * @access	private
+	 **/
+	protected $current_user = false;
 
-  /**
-  * Check if the Auth passed
-  * See {@link Lockdown_Manager::getAuthPassed()}
-  *
-  * @type boolean
-  */
-  protected $passed = FALSE;
+	/**
+	 * Check if the Auth passed
+	 * See {@link Lockdown_Manager::getAuthPassed()}
+	 *
+	 * @type boolean
+	 */
+	protected $passed = false;
 
-  /**
-  * Admin Instance
-  *
-  * @type Lockdown_Admin
-  */
-  public $admin;
+	/**
+	 * Admin Instance
+	 *
+	 * @type Lockdown_Admin
+	 */
+	public $admin;
 
-  /**
-  * Application Instance
-  *
-  * @type  Lockdown_Application
-  */
-  public $application;
+	/**
+	 * Application Instance
+	 *
+	 * @type  Lockdown_Application
+	 */
+	public $application;
 
-  /**
-   * Static Instance of Manager
-   *
-   * @var Lockdown_Manager
-   */
-  protected static $instance;
+	/**
+	 * Static Instance of Manager
+	 *
+	 * @var Lockdown_Manager
+	 */
+	protected static $instance;
 
-  /**
-  * Constructor
-  *
-  * @return void
-  */
-  public function __construct()
-  {
-    // We don't like adding network wide WordPress plugins.
-    if (! class_exists('Disable_WPMS_Plugin_LD')) {
-      require_once( LD_PLUGIN_DIR . '/no-wpmu.php' );
-    }
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
+	public function __construct() {
 
-    // Include dependant classes
-    require_once(LD_PLUGIN_DIR.'/src/Lockdown/Application.php');
-    require_once(LD_PLUGIN_DIR.'/src/Lockdown/Admin.php');
+		// We don't like adding network wide WordPress plugins.
+		if ( ! class_exists( 'Disable_WPMS_Plugin_LD' ) ) {
+			require_once( LD_PLUGIN_DIR . '/no-wpmu.php' );
+		}
 
-    // Instantiate objects
-    $this->admin = new Lockdown_Admin($this);
-    $this->application = new Lockdown_Application($this);
-  }
+		// Include dependant classes
+		require_once( LD_PLUGIN_DIR.'/src/Lockdown/Application.php' );
+		require_once( LD_PLUGIN_DIR.'/src/Lockdown/Admin.php' );
 
-  /**
-   * Retrieve the singleton instance of the manager
-   *
-   * @return Lockdown_Manager
-   */
-  public static function instance()
-  {
-    if (!static::$instance) {
-      static::$instance = new static;
-    }
+		// Instantiate objects
+		$this->admin = new Lockdown_Admin( $this );
+		$this->application = new Lockdown_Application( $this );
+	}
 
-    return static::$instance;
-  }
+	/**
+	 * Retrieve the singleton instance of the manager
+	 *
+	 * @return Lockdown_Manager
+	 */
+	public static function instance() {
 
-  /**
-  * Retrieve the Login Base
-  * @return string
-  */
-  public function getLoginBase()
-  {
-    return $this->application->getLoginBase();
-  }
+		if ( ! static::$instance ) {
+			static::$instance = new static;
+		}
 
-  /**
-  * See if the auth passed
-  *
-  * @return boolean
-  */
-  public function getAuthPassed()
-  {
-    return (bool) $this->passed;
-  }
+		return static::$instance;
+	}
 
-  /**
-  * Update the Passed Auth Value
-  * See {@link Lockdown_Manager::getAuthPassed()}
-  *
-  * @access public
-  * @param boolean
-  */
-  public function passed($value)
-  {
-    $this->passed = (bool) $value;
-  }
+	/**
+	 * Retrieve the Login Base
+	 * @return string
+	 */
+	public function getLoginBase() {
+
+		return $this->application->getLoginBase();
+	}
+
+	/**
+	 * See if the auth passed
+	 *
+	 * @return boolean
+	 */
+	public function getAuthPassed() {
+
+		return (bool) $this->passed;
+	}
+
+	/**
+	 * Update the Passed Auth Value
+	 * See {@link Lockdown_Manager::getAuthPassed()}
+	 *
+	 * @access public
+	 * @param boolean
+	 */
+	public function passed( $value ) {
+		$this->passed = (bool) $value;
+	}
 }
