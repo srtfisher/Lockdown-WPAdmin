@@ -93,6 +93,14 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertEquals('http://localhost/login', $this->object->application->filterLoginUrl('http://localhost/wp-login.php'));
 	}
+
+	public function testSingleton()
+	{
+		$instance = Lockdown_Manager::instance();
+		$instance->test_var = true;
+
+		$this->assertTrue( Lockdown_Manager::instance()->test_var );
+	}
 }
 
 /**

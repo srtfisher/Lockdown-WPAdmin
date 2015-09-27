@@ -70,7 +70,9 @@ class Lockdown_Application {
 		// We only will hide it if we are in admin (/wp-admin/)
 		if ( is_admin() ) {
 			// Non logged in users.
-			if ( ! is_user_logged_in() ) { $this->throw404(); }
+			if ( ! is_user_logged_in() ) {
+				$this->throw404();
+			}
 
 			// Setup HTTP auth.
 			$this->setupHttpCheck();
@@ -112,10 +114,10 @@ class Lockdown_Application {
 
 		if ( empty( $four_tpl ) or ! file_exists( $four_tpl ) ) {
 			// We're gonna try and get TwentyTen's one
-			$twenty_ten_tpl = apply_filters( 'LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentyfifteen/404.php' );
+			$wp_theme_404 = apply_filters( 'LD_404_FALLBACK', WP_CONTENT_DIR . '/themes/twentyfifteen/404.php' );
 
-			if ( file_exists( $twenty_ten_tpl ) ) {
-				require( $twenty_ten_tpl );
+			if ( file_exists( $wp_theme_404 ) ) {
+				require( $wp_theme_404 );
 			} else {
 				wp_die( '404 - File not found!', '', array( 'response' => 404 ) );
 			}
@@ -275,12 +277,13 @@ class Lockdown_Application {
 
 				// Invalid creds
 				if ( ! $creds ) {
-					$this->unauthorizedArea(); }
+					$this->unauthorizedArea();
+				}
 
 				// Did they enter a valid user?
 				if ( $this->matchUserToArray( $users, $creds['username'], $creds['password'] ) ) {
 					$this->instance->passed( true );
-					return $this->setUser( $users, $creds['username'] );
+					return $this->setUser( $creds['username'] );
 				} else {
 					return $this->unauthorizedArea();
 				}
@@ -317,13 +320,14 @@ class Lockdown_Application {
 	 * Set the current user
 	 *
 	 * @access private
-	 * @param array
-	 * @param integer
+	 * @param  string $username
 	 */
-	public function setUser( $array, $user ) {
-		foreach ( $array as $key => $val ) {
-			if ( $val['user'] === $user ) {
+	public function setUser( $username ) {
+		$users = $this->getPrivateUsers();
+		foreach ( $users as $key => $val ) {
+			if ( $val['user'] === $username ) {
 				$this->current_user = $key;
+				return $this->current_user;
 			}
 		}
 	}
@@ -370,7 +374,7 @@ class Lockdown_Application {
 	}
 
 	/**
-	 * See if a login base is suggested against
+	 * See if a login base is suggested from being used
 	 *
 	 * @return boolean
 	 */
@@ -527,7 +531,7 @@ class Lockdown_Application {
 	 * @return bool
 	 */
 	public function is_hiding_admin() {
-		$opt = get_option('ld_hide_wp_admin');
+		$opt = get_option( 'ld_hide_wp_admin' );
 		return ( 'yep' === $opt || '1' == $opt );
 	}
 }

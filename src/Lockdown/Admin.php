@@ -3,6 +3,7 @@
  * Admin Interface for Lockdown WP Admin
  *
  * @package lockdown
+ * @codeCoverageIgnore
  */
 class Lockdown_Admin {
 	/**
@@ -41,7 +42,7 @@ class Lockdown_Admin {
 	/**
 	 * Adds the admin menu
 	 *
-	 * @acces private
+	 * @access private
 	 */
 	public function add_admin_menu() {
 		add_menu_page(

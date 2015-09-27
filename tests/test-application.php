@@ -61,6 +61,21 @@ class LockdownApplicationTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @expectedException Exception
+	 */
+	public function testEmptyPrivateUser() {
+		$this->object->application->addPrivateUser( 'User', '' );
+	}
+
+	public function testSuggestedAgainst() {
+		$this->object->application->setLoginBase( 'login' );
+		$this->assertTrue( $this->object->application->isSuggestedAgainst() );
+
+		$this->object->application->setLoginBase( 'random-string' );
+		$this->assertFalse( $this->object->application->isSuggestedAgainst() );
+	}
+
+	/**
 	 * Test if a username exists
 	 */
 	public function testDoesUsernameExist() {
