@@ -23,17 +23,67 @@ class LockdownApplicationTest extends PHPUnit_Framework_TestCase {
 
 		// Should pass
 		$this->assertTrue(
-			$this->invokeMethod($this->object->application, 'matchUserToArray', array($users, 'admin', 'password'))
+			$this->invokeMethod( $this->object->application, 'matchUserToArray', array($users, 'admin', 'password'))
 		);
 
 		// Both should fail
 		$this->assertFalse(
-			$this->invokeMethod($this->object->application, 'matchUserToArray', array($users, 'admin', 'notpassword'))
+			$this->invokeMethod( $this->object->application, 'matchUserToArray', array($users, 'admin', 'notpassword'))
 		);
 
 		$this->assertFalse(
-			$this->invokeMethod($this->object->application, 'matchUserToArray', array(array(), 'admin', 'notpassword'))
+			$this->invokeMethod( $this->object->application, 'matchUserToArray', array(array(), 'admin', 'notpassword'))
 		);
+	}
+
+	public function testIsHidingAdmin() {
+		update_option( 'ld_hide_wp_admin', '0' );
+		$this->assertFalse( $this->object->application->is_hiding_admin() );
+
+		update_option( 'ld_hide_wp_admin', '1' );
+		$this->assertTrue( $this->object->application->is_hiding_admin() );
+
+		update_option( 'ld_hide_wp_admin', 'yep' );
+		$this->assertTrue( $this->object->application->is_hiding_admin() );
+	}
+
+	public function testAddPrivateUser() {
+		$this->object->application->addPrivateUser( 'add', 'user' );
+		$this->assertTrue( $this->object->application->doesUsernameExist( 'add' ) );
+	}
+
+	/**
+	 * @expectedException Exception
+	 */
+	public function testAddExistingPrivateUser() {
+		$this->object->application->addPrivateUser( 'double', 'user' );
+		$this->object->application->addPrivateUser( 'double', 'user' );
+	}
+
+	/**
+	 * @expectedException Exception
+	 */
+	public function testEmptyPrivateUser() {
+		$this->object->application->addPrivateUser( 'User', '' );
+	}
+
+	public function testSuggestedAgainst() {
+		$this->object->application->setLoginBase( 'login' );
+		$this->assertTrue( $this->object->application->isSuggestedAgainst() );
+
+		$this->object->application->setLoginBase( 'random-string' );
+		$this->assertFalse( $this->object->application->isSuggestedAgainst() );
+	}
+
+	/**
+	 * Test if a username exists
+	 */
+	public function testDoesUsernameExist() {
+		$this->invokeMethod( $this->object->application, 'setPrivateUsers', array( array() ) );
+		$this->assertFalse( $this->object->application->doesUsernameExist( 'username' ) );
+
+		$this->invokeMethod( $this->object->application, 'setPrivateUsers', array( array( array( 'user' => 'username', 'pass' => '123' ) ) ) );
+		$this->assertTrue( $this->object->application->doesUsernameExist( 'username' ) );
 	}
 
 	public function testNoSettingsPassed()

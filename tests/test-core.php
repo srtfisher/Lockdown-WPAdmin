@@ -21,7 +21,7 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	{
 		$this->assertTrue(is_string($this->object->relm));
 	}
-	
+
 	/**
 	 * Test that the application has added an action to init
 	 */
@@ -37,8 +37,9 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 	{
 		add_filter('ld_class', function() { return 'LdProxyObject'; });
 		$setup = ld_setup_auth();
+
 		$this->assertEquals('LdProxyObject', get_class($setup));
-		$this->assertEquals('WP_LockAuth', get_class($this->object));
+		$this->assertEquals('Lockdown_Manager', get_class($this->object));
 	}
 
 	public function testFiltersWithoutBase()
@@ -77,13 +78,40 @@ class LockdownTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('login', $this->object->getLoginBase());
 	}
 
+	public function testLogoutUrl()
+	{
+		// Update the login base
+		update_option('ld_login_base', 'login');
+
+		$this->object->application->renameLogin();
+		$logout_url = wp_logout_url();
+
+		$this->assertTrue(strpos($logout_url, 'login') >= 0);
+	}
+
 	public function testRewriteUrl()
 	{
-		$this->assertEquals('http://localhost/login', $this->object->application->filterWpLogin('http://localhost/wp-login.php'));
+		$this->assertEquals('http://localhost/login', $this->object->application->filterLoginUrl('http://localhost/wp-login.php'));
+	}
+
+	public function testSingleton()
+	{
+		$instance = Lockdown_Manager::instance();
+		$instance->test_var = true;
+
+		$this->assertTrue( Lockdown_Manager::instance()->test_var );
 	}
 }
 
 /**
  * @ignore
  */
-class LdProxyObject extends WP_LockAuth { }
+class LdProxyObject extends Lockdown_Manager {
+	/**
+	 * Get around the singleton nature of the application
+	 */
+	public static function instance()
+	{
+		return new LdProxyObject;
+	}
+}

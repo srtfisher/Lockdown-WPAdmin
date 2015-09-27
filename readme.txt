@@ -4,8 +4,8 @@ Donate link: http://seanfisher.co/donate/
 Link: http://seanfisher.co/lockdown-wp-admin/
 Tags: security, secure, lockdown, vulnerability, website security, wp-admin, login, hide login, rename login, http auth, 404, lockdown, srtfisher, secure
 Requires at least: 3.6
-Tested up to: 3.8
-Stable tag: 2.2
+Tested up to: 4.3.1
+Stable tag: 2.3
 
 Lockdown WP Admin conceals the administration and login screen from intruders. It can hide WordPress Admin (/wp-admin/) and and login (/wp-login.php) as well as add HTTP authentication to the login system. We can also change the login URL from wp-login.php to whatever you'd like: /login, /log-in-here, etc.
 
@@ -106,4 +106,9 @@ A very late update, sorry! Worked to fix many issues with the admin bar and the 
 = 2.2 =
 * Fixing issues with other plugins
 * Support tested for 3.9
-* Large code structure changes. If you are extending the `WP_LockAuth` at all, you should basically check the class anew since it was seperated into Admin and Application services.
+* Large code structure changes. If you are extending the `Lockdown_Manager` at all, you should basically check the class anew since it was separated into Admin and Application services.
+
+= 2.3 =
+* Fixing issues with latests WordPress Version
+* Cleaning of code, enhancements.
+* Localizing all the strings.
