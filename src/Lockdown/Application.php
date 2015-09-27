@@ -38,15 +38,13 @@ class Lockdown_Application {
 	 * Setup hiding wp-admin
 	 */
 	protected function ininitializeConceal() {
-		$opt = get_option( 'ld_hide_wp_admin' );
-
 		// Nope, they didn't enable it.
-		if ( $opt !== 'yep' ) {
+		if ( ! $this->is_hiding_admin() ) {
 			return;
 		}
 
 		// We're gonna hide it.
-		$no_check_files = apply_filters('no_check_files',
+		$no_check_files = apply_filters( 'no_check_files',
 			array( 'async-upload.php', 'admin-ajax.php', 'wp-app.php' )
 		);
 
@@ -59,7 +57,7 @@ class Lockdown_Application {
 		$explode = explode( '/', $script_filename );
 		$file = array_pop( $explode );
 
-	    	// Disable for WP-CLI
+		// Disable for WP-CLI
 		if ( defined( 'WP_CLI' ) and WP_CLI ) {
 			return $this->instance->passed( true );
 		}
@@ -174,11 +172,13 @@ class Lockdown_Application {
 
 		// Are they visiting wp-login.php?
 		if ( $super_base == 'wp-login.php' ) {
-			$this->throw404(); }
+			$this->throw404();
+		}
 
 		// Is this the "login" url?
 		if ( $base !== $this->getLoginBase() ) {
-			return false; }
+			return false;
+		}
 
 		// We dont' want a WP plugin caching this page
 		@define( 'NO_CACHE', true );
@@ -371,11 +371,11 @@ class Lockdown_Application {
 	 * @return boolean
 	 */
 	public function isSuggestedAgainst() {
-		return (in_array($this->login_base, array(
+		return in_array( $this->login_base, array(
 			'login',
 			'admin',
 			'user-login',
-		)));
+		) );
 	}
 
 	/**
