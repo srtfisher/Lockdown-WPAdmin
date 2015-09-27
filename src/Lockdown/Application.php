@@ -190,6 +190,9 @@ class Lockdown_Application {
 		// Hook onto this
 		do_action( 'ld_login_page' );
 
+		// Prevent errors from defining constants again
+		error_reporting( E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR );
+
 		include ABSPATH . '/wp-login.php';
 		exit;
 	}
